@@ -1,0 +1,3 @@
+class Foo {
+    // Test class
+}

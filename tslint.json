@@ -1,0 +1,18 @@
+{
+  "extends": "tslint:latest",
+  "rules": {
+    "variable-name": [
+      true,
+      "allow-leading-underscore"
+    ],
+    "whitespace": [
+      true,
+      "check-operator",
+      "check-branch",
+      "check-decl",
+      "check-module",
+      "check-separator",
+      "check-type"
+    ]
+  }
+}
