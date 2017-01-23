@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import * as ts from "typescript";
 import { Delinter } from "./delint";
+import * as formatter from "./formatter/index";
 import * as uml from "./uml/index";
 
 export class TypeScriptUml {
@@ -19,6 +20,10 @@ export class TypeScriptUml {
         }
 
         return delinter.umlProgram;
+    }
+
+    public static generateClassDiagram(program: uml.Program, formatter: formatter.AbstractFormatter): string {
+        return formatter.generateClassDiagram(program);
     }
 
     private constructor() {
