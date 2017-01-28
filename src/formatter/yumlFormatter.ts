@@ -8,7 +8,11 @@ export class Formatter extends AbstractFormatter {
     }
 
     public generateClassDiagram(umlProgram: uml.Program): string {
-        return "";
+        let yuml = "// {type:class}\n";
+        umlProgram.classes.forEach((key, value) => {
+            yuml += `[${value.name}]\n`;
+        });
+        return yuml;
     }
 
 }
