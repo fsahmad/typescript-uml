@@ -11,11 +11,12 @@ describe("Delinter", () => {
     let delinter: Delinter;
 
     describe("#parse", () => {
-        const TEST_FILE = "test/delint/class.test.ts";
+        const TEST_FILE_CLASS = "testInput/delint/class.test.ts";
+        const TEST_FILE_INTERFACE = "testInput/delint/interface.test.ts";
 
         describe("given class.test.ts", () => {
             before(() => {
-                sourceFile = ts.createSourceFile(TEST_FILE, readFileSync(TEST_FILE).toString(),
+                sourceFile = ts.createSourceFile(TEST_FILE_CLASS, readFileSync(TEST_FILE_CLASS).toString(),
                     ts.ScriptTarget.ES5, /*setParentNodes */ true);
             });
 
@@ -31,7 +32,7 @@ describe("Delinter", () => {
 
         describe.skip("given interface.test.ts", () => {
             before(() => {
-                sourceFile = ts.createSourceFile(TEST_FILE, readFileSync(TEST_FILE).toString(),
+                sourceFile = ts.createSourceFile(TEST_FILE_INTERFACE, readFileSync(TEST_FILE_INTERFACE).toString(),
                     ts.ScriptTarget.ES5, /*setParentNodes */ true);
             });
 

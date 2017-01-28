@@ -45,17 +45,17 @@ describe("TypeScriptUml", () => {
         });
 
         it("should parse source files using delinter", () => {
-            filenames = ["test/delint/class.test.ts", "test/delint/interface.test.ts"];
+            filenames = ["testInput/delint/class.test.ts", "testInput/delint/interface.test.ts"];
             executeCut();
             expect(parseStub).to.have.been.calledWith(
                 sinon.match({
-                    fileName: "test/delint/class.test.ts",
+                    fileName: "testInput/delint/class.test.ts",
                     languageVersion: scriptTarget,
                     text: "class Foo {\n    // Test class\n}\n",
                 }));
             expect(parseStub).to.have.been.calledWith(
                 sinon.match({
-                    fileName: "test/delint/interface.test.ts",
+                    fileName: "testInput/delint/interface.test.ts",
                     languageVersion: scriptTarget,
                     text: "interface IBar {\n    fooBar: string;\n}\n",
                 }));
