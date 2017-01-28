@@ -34,7 +34,7 @@ describe("TypeScriptUml", () => {
             scriptTarget = ts.ScriptTarget.ES5;
         });
 
-        let executeCut = () => {
+        const executeCut = () => {
             returnValue = Uml.TypeScriptUml.parseUmlProgram(filenames, scriptTarget);
         };
 
@@ -71,18 +71,18 @@ describe("TypeScriptUml", () => {
         let program: Uml.Program;
         let formatter: Formatter.AbstractFormatter;
 
-        let executeCut = () => {
+        const executeCut = () => {
             return Uml.TypeScriptUml.generateClassDiagram(program, formatter);
         };
 
         beforeEach(() => {
             program = new Uml.Program();
             formatter = new Formatter.AbstractFormatter();
-        })
+        });
 
         it("should call formatter with program", () => {
             sandbox.spy(formatter, "generateClassDiagram");
-            let returnValue = executeCut();
+            const returnValue = executeCut();
             expect(formatter.generateClassDiagram)
                 .to.have.been.calledOnce
                 .and.calledWith(program)

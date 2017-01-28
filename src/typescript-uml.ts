@@ -10,10 +10,10 @@ export class TypeScriptUml {
         filenames: string[],
         scriptTarget: ts.ScriptTarget = ts.ScriptTarget.ES5): uml.Program {
 
-        let delinter = new Delinter();
+        const delinter = new Delinter();
 
-        for (let f of filenames) {
-            let sourceFile = ts.createSourceFile(f, readFileSync(f).toString(),
+        for (const f of filenames) {
+            const sourceFile = ts.createSourceFile(f, readFileSync(f).toString(),
                 scriptTarget, /*setParentNodes */ true);
 
             delinter.parse(sourceFile);

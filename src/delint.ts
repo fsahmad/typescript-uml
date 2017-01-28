@@ -21,8 +21,8 @@ export class Delinter {
     private _delintNode(node: ts.Node) {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
-                let classNode = <ts.ClassDeclaration>node;
-                let umlClass = new uml.Class();
+                const classNode = node as ts.ClassDeclaration;
+                const umlClass = new uml.Class();
                 umlClass.name = classNode.name.getText();
                 this._umlProgram.classes.setValue(umlClass.name, umlClass);
                 break;
