@@ -60,8 +60,6 @@ describe("YumlFormatter", () => {
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
             expect(returnValue).to.match(/^\[<<Foo>>\]\s*$/m);
             expect(returnValue).to.match(/^\[<<Bar>>\]\s*$/m);
-            // tslint:disable-next-line:no-console
-            console.log(returnValue);
         });
 
     });

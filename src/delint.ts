@@ -22,9 +22,18 @@ export class Delinter {
     private _delintNode(node: ts.Node) {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
-                const classNode = node as ts.ClassDeclaration;
-                const umlClass = new uml.Class(uuid.v1(), classNode.name.getText());
-                this._umlProgram.nodes.setValue(umlClass.name, umlClass);
+                {
+                    const classNode = node as ts.ClassDeclaration;
+                    const umlClass = new uml.Class(uuid.v1(), classNode.name.getText());
+                    this._umlProgram.nodes.setValue(umlClass.name, umlClass);
+                }
+                break;
+            case ts.SyntaxKind.InterfaceDeclaration:
+                {
+                    const interfaceNode = node as ts.InterfaceDeclaration;
+                    const umlInterface = new uml.Interface(uuid.v1(), interfaceNode.name.getText());
+                    this._umlProgram.nodes.setValue(umlInterface.name, umlInterface);
+                }
                 break;
             default:
                 break;

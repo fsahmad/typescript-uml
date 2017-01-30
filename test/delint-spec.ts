@@ -30,7 +30,7 @@ describe("Delinter", () => {
             });
         });
 
-        describe.skip("given interface.test.ts", () => {
+        describe("given interface.test.ts", () => {
             before(() => {
                 sourceFile = ts.createSourceFile(TEST_FILE_INTERFACE, readFileSync(TEST_FILE_INTERFACE).toString(),
                     ts.ScriptTarget.ES5, /*setParentNodes */ true);
