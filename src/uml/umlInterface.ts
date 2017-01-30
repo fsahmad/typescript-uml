@@ -1,5 +1,5 @@
 import { UmlNode } from "./umlNode";
 
-export class UmlClass extends UmlNode {
+export class UmlInterface extends UmlNode {
     // No custom properties
 }

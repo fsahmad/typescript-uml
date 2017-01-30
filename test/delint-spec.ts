@@ -26,7 +26,7 @@ describe("Delinter", () => {
 
             it("should add class to uml program", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.classes.containsKey("Foo")).to.be.true;
+                expect(delinter.umlProgram.nodes.containsKey("Foo")).to.be.true;
             });
         });
 
@@ -42,7 +42,7 @@ describe("Delinter", () => {
 
             it("should add interface to uml program", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.classes.containsKey("IBar")).to.be.true;
+                expect(delinter.umlProgram.nodes.containsKey("IBar")).to.be.true;
             });
         });
 

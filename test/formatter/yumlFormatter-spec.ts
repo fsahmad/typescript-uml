@@ -37,16 +37,32 @@ describe("YumlFormatter", () => {
         });
 
         it("should handle uml program with unassociated classes", () => {
-            const foo = new Uml.Class();
-            foo.name = "Foo";
-            umlProgram.classes.setValue(foo.name, foo);
-            const bar = new Uml.Class();
-            bar.name = "Bar";
-            umlProgram.classes.setValue(bar.name, bar);
+            const foo = new Uml.Class("foo", "Foo");
+            const bar = new Uml.Class("bar", "Bar");
+            umlProgram.nodes.setValue(foo.name, foo);
+            umlProgram.nodes.setValue(bar.name, bar);
+
             expect(executeCut()).to.not.throw;
+
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
             expect(returnValue).to.match(/^\[Foo\]\s*$/m);
             expect(returnValue).to.match(/^\[Bar\]\s*$/m);
         });
+
+        it("should handle uml program with unassociated interfaces", () => {
+            const foo = new Uml.Interface("foo", "Foo");
+            const bar = new Uml.Interface("bar", "Bar");
+            umlProgram.nodes.setValue(foo.name, foo);
+            umlProgram.nodes.setValue(bar.name, bar);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[<<Foo>>\]\s*$/m);
+            expect(returnValue).to.match(/^\[<<Bar>>\]\s*$/m);
+            // tslint:disable-next-line:no-console
+            console.log(returnValue);
+        });
+
     });
 });

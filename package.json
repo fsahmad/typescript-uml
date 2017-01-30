@@ -23,7 +23,8 @@
   },
   "dependencies": {
     "typescript": "2.0.3",
-    "typescript-collections": "^1.2.3"
+    "typescript-collections": "^1.2.3",
+    "uuid": "^2.0.3"
   },
   "devDependencies": {
     "@types/chai": "3.4.30",
@@ -31,6 +32,7 @@
     "@types/node": "6.0.31",
     "@types/sinon": "^1.16.32",
     "@types/sinon-chai": "^2.7.27",
+    "@types/uuid": "^2.0.29",
     "chai": "^3.5.0",
     "mocha": "^3.0.1",
     "rimraf": "^2.5.4",

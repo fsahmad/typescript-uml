@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import * as ts from "typescript";
+import * as uuid from "uuid";
 import * as uml from "./uml/index";
 
 export class Delinter {
@@ -22,9 +23,8 @@ export class Delinter {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
                 const classNode = node as ts.ClassDeclaration;
-                const umlClass = new uml.Class();
-                umlClass.name = classNode.name.getText();
-                this._umlProgram.classes.setValue(umlClass.name, umlClass);
+                const umlClass = new uml.Class(uuid.v1(), classNode.name.getText());
+                this._umlProgram.nodes.setValue(umlClass.name, umlClass);
                 break;
             default:
                 break;

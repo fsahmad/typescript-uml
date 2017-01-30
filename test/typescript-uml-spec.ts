@@ -41,7 +41,7 @@ describe("TypeScriptUml", () => {
         it("should handle no files", () => {
             expect(executeCut()).to.not.throw;
             expect(returnValue.associations).to.eql([]);
-            expect(returnValue.classes.isEmpty()).to.be.true;
+            expect(returnValue.nodes.isEmpty()).to.be.true;
         });
 
         it("should parse source files using delinter", () => {

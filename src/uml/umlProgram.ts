@@ -1,20 +1,21 @@
 import * as Collections from "typescript-collections";
 import { UmlAssociation } from "./umlAssociation";
 import { UmlClass } from "./umlClass";
+import { UmlNode } from "./umlNode";
 
-export type UmlClassDict = Collections.Dictionary<string, UmlClass>;
+export type UmlNodeDict = Collections.Dictionary<string, UmlNode>;
 
 export class UmlProgram {
 
-    private _classes: UmlClassDict;
+    private _nodes: UmlNodeDict;
     private _associations: UmlAssociation[];
 
-    public get classes(): UmlClassDict {
-        return this._classes;
+    public get nodes(): UmlNodeDict {
+        return this._nodes;
     }
 
-    public set classes(value: UmlClassDict) {
-        this._classes = value;
+    public set nodes(value: UmlNodeDict) {
+        this._nodes = value;
     }
 
     public get associations(): UmlAssociation[] {
@@ -26,7 +27,7 @@ export class UmlProgram {
     }
 
     constructor() {
-        this._classes = new Collections.Dictionary<string, UmlClass>();
+        this._nodes = new Collections.Dictionary<string, UmlNode>();
         this._associations = [];
     }
 }
