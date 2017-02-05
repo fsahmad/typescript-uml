@@ -22,22 +22,47 @@ export class Delinter {
     private _delintNode(node: ts.Node) {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
-                {
-                    const classNode = node as ts.ClassDeclaration;
-                    const umlClass = new uml.Class(uuid.v1(), classNode.name.getText());
-                    this._umlProgram.nodes.setValue(umlClass.name, umlClass);
-                }
+                this._delintClassDeclaration(node as ts.ClassDeclaration);
                 break;
             case ts.SyntaxKind.InterfaceDeclaration:
-                {
-                    const interfaceNode = node as ts.InterfaceDeclaration;
-                    const umlInterface = new uml.Interface(uuid.v1(), interfaceNode.name.getText());
-                    this._umlProgram.nodes.setValue(umlInterface.name, umlInterface);
-                }
+                this._delintInterfaceDeclaration(node as ts.InterfaceDeclaration);
                 break;
             default:
                 break;
         }
         ts.forEachChild(node, (n) => { this._delintNode(n); });
     }
+
+    private _delintClassDeclaration(node: ts.ClassDeclaration) {
+        const umlClass = new uml.Class(node.name.getText());
+        this._umlProgram.nodes.setValue(umlClass.name, umlClass);
+
+        node.heritageClauses.forEach((h) => {
+            switch (h.token) {
+                case ts.SyntaxKind.ImplementsKeyword:
+                    h.types.forEach((t) => {
+                        const interfaceName = t.expression.getText();
+                        // Add interface to program if not exists
+                        if (!this._umlProgram.nodes.containsKey(interfaceName)) {
+                            const umlInterface = new uml.Interface(interfaceName);
+                            this._umlProgram.nodes.setValue(interfaceName, umlInterface);
+                        }
+
+                        const association = new uml.Association();
+                        association.fromName = umlClass.name;
+                        association.toName = interfaceName;
+                        this._umlProgram.associations.push(association);
+                    });
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    private _delintInterfaceDeclaration(node: ts.InterfaceDeclaration) {
+        const umlInterface = new uml.Interface(node.name.getText());
+        this._umlProgram.nodes.setValue(umlInterface.name, umlInterface);
+    }
+
 }

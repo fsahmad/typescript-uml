@@ -37,8 +37,8 @@ describe("YumlFormatter", () => {
         });
 
         it("should handle uml program with unassociated classes", () => {
-            const foo = new Uml.Class("foo", "Foo");
-            const bar = new Uml.Class("bar", "Bar");
+            const foo = new Uml.Class("Foo");
+            const bar = new Uml.Class("Bar");
             umlProgram.nodes.setValue(foo.name, foo);
             umlProgram.nodes.setValue(bar.name, bar);
 
@@ -50,8 +50,8 @@ describe("YumlFormatter", () => {
         });
 
         it("should handle uml program with unassociated interfaces", () => {
-            const foo = new Uml.Interface("foo", "Foo");
-            const bar = new Uml.Interface("bar", "Bar");
+            const foo = new Uml.Interface("Foo");
+            const bar = new Uml.Interface("Bar");
             umlProgram.nodes.setValue(foo.name, foo);
             umlProgram.nodes.setValue(bar.name, bar);
 

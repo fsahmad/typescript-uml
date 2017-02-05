@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import "mocha";
 import * as ts from "typescript";
 import { Delinter } from "../src/delint";
-
+import * as uml from "../src/uml";
 const expect = chai.expect;
 
 describe("Delinter", () => {
@@ -27,6 +27,24 @@ describe("Delinter", () => {
             it("should add class to uml program", () => {
                 delinter.parse(sourceFile);
                 expect(delinter.umlProgram.nodes.containsKey("Foo")).to.be.true;
+                expect(delinter.umlProgram.nodes.getValue("Foo")).to.be.instanceof(uml.Class);
+            });
+
+            it("should add interfaces to uml program", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.nodes.containsKey("IBar")).to.be.true;
+                expect(delinter.umlProgram.nodes.containsKey("IFoo")).to.be.true;
+                expect(delinter.umlProgram.nodes.getValue("IBar")).to.be.instanceof(uml.Interface);
+                expect(delinter.umlProgram.nodes.getValue("IFoo")).to.be.instanceof(uml.Interface);
+            });
+
+            it("should add inheritance associations to uml program", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.associations).to.have.length(2);
+                expect(delinter.umlProgram.associations[0]).to.have.property("fromName", "Foo");
+                expect(delinter.umlProgram.associations[0]).to.have.property("toName", "IBar");
+                expect(delinter.umlProgram.associations[1]).to.have.property("fromName", "Foo");
+                expect(delinter.umlProgram.associations[1]).to.have.property("toName", "IFoo");
             });
         });
 

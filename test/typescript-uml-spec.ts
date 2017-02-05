@@ -51,7 +51,7 @@ describe("TypeScriptUml", () => {
                 sinon.match({
                     fileName: "testInput/delint/class.test.ts",
                     languageVersion: scriptTarget,
-                    text: "class Foo {\n    // Test class\n}\n",
+                    text: "class Foo implements IBar, IFoo {\n    // Test class\n}\n",
                 }));
             expect(parseStub).to.have.been.calledWith(
                 sinon.match({
