@@ -38,31 +38,61 @@ describe("Delinter", () => {
                 expect(delinter.umlProgram.nodes.getValue("IFoo")).to.be.instanceof(uml.Interface);
             });
 
-            it("should add inheritance associations to uml program", () => {
+            it("should not replace existing interfaces", () => {
+                const interfaceIBar = new uml.Interface("IBar");
+                delinter.umlProgram.nodes.setValue("IBar", interfaceIBar);
+
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.associations).to.have.length(2);
-                expect(delinter.umlProgram.associations[0]).to.have.property("fromName", "Foo");
-                expect(delinter.umlProgram.associations[0]).to.have.property("toName", "IBar");
-                expect(delinter.umlProgram.associations[1]).to.have.property("fromName", "Foo");
-                expect(delinter.umlProgram.associations[1]).to.have.property("toName", "IFoo");
-            });
-        });
-
-        describe("given interface.test.ts", () => {
-            before(() => {
-                sourceFile = ts.createSourceFile(TEST_FILE_INTERFACE, readFileSync(TEST_FILE_INTERFACE).toString(),
-                    ts.ScriptTarget.ES5, /*setParentNodes */ true);
+                expect(delinter.umlProgram.nodes.getValue("IBar")).to.equal(interfaceIBar);
             });
 
-            beforeEach(() => {
-                delinter = new Delinter();
-            });
-
-            it("should add interface to uml program", () => {
+            it("should add interface generalizations to uml program", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.containsKey("IBar")).to.be.true;
+                expect(delinter.umlProgram.generalizations.filter((value) => {
+                    return value.fromName === "Foo" && value.toName === "IBar";
+                })).to.have.length(1, "Missing generalization from Foo to IBar");
+                expect(delinter.umlProgram.generalizations.filter((value) => {
+                    return value.fromName === "Foo" && value.toName === "IFoo";
+                })).to.have.length(1, "Missing generalization from Foo to IFoo");
             });
-        });
 
+            it("should add parent class to uml program", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.nodes.containsKey("Bar")).to.be.true;
+                expect(delinter.umlProgram.nodes.getValue("Bar")).to.be.instanceof(uml.Class);
+            });
+
+            it("should not replace existing classes", () => {
+                const classBar = new uml.Class("Bar");
+                delinter.umlProgram.nodes.setValue("Bar", classBar);
+
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.nodes.getValue("Bar")).to.equal(classBar);
+            });
+
+            it("should add extension generalizations to uml program", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.generalizations.filter((value) => {
+                    return value.fromName === "Foo" && value.toName === "Bar";
+                })).to.have.length(1, "Missing generalization from Foo to Bar");
+            });
+
+            describe("given interface.test.ts", () => {
+                before(() => {
+                    sourceFile = ts.createSourceFile(TEST_FILE_INTERFACE, readFileSync(TEST_FILE_INTERFACE).toString(),
+                        ts.ScriptTarget.ES5, /*setParentNodes */ true);
+                });
+
+                beforeEach(() => {
+                    delinter = new Delinter();
+                });
+
+                it("should add interface to uml program", () => {
+                    delinter.parse(sourceFile);
+                    expect(delinter.umlProgram.nodes.containsKey("IBar")).to.be.true;
+                });
+            });
+
+        });
     });
 });

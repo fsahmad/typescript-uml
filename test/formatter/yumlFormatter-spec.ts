@@ -62,5 +62,56 @@ describe("YumlFormatter", () => {
             expect(returnValue).to.match(/^\[<<Bar>>\]\s*$/m);
         });
 
+        it("should handle uml program with class inheritance", () => {
+            const foo = new Uml.Class("Foo");
+            const bar = new Uml.Class("Bar");
+            umlProgram.nodes.setValue(foo.name, foo);
+            umlProgram.nodes.setValue(bar.name, bar);
+
+            const generalization = new Uml.Generalization();
+            generalization.fromName = foo.name;
+            generalization.toName = bar.name;
+            umlProgram.generalizations.push(generalization);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Bar\]\^\[Foo\]\s*$/m);
+        });
+
+        it("should handle uml program with interface inheritance", () => {
+            const foo = new Uml.Class("Foo");
+            const bar = new Uml.Interface("IBar");
+            umlProgram.nodes.setValue(foo.name, foo);
+            umlProgram.nodes.setValue(bar.name, bar);
+
+            const generalization = new Uml.Generalization();
+            generalization.fromName = foo.name;
+            generalization.toName = bar.name;
+            umlProgram.generalizations.push(generalization);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[<<IBar>>\]\^\[Foo\]\s*$/m);
+        });
+
+        it("should not output classes separately when outputted as link", () => {
+            const foo = new Uml.Class("Foo");
+            const bar = new Uml.Interface("IBar");
+            umlProgram.nodes.setValue(foo.name, foo);
+            umlProgram.nodes.setValue(bar.name, bar);
+
+            const generalization = new Uml.Generalization();
+            generalization.fromName = foo.name;
+            generalization.toName = bar.name;
+            umlProgram.generalizations.push(generalization);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).not.to.match(/^\[Foo\]\s*$/m);
+            expect(returnValue).not.to.match(/^\[<<IBar>>\]\s*$/m);
+        });
     });
 });

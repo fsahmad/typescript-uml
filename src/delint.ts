@@ -48,10 +48,25 @@ export class Delinter {
                             this._umlProgram.nodes.setValue(interfaceName, umlInterface);
                         }
 
-                        const association = new uml.Association();
-                        association.fromName = umlClass.name;
-                        association.toName = interfaceName;
-                        this._umlProgram.associations.push(association);
+                        const generalization = new uml.Generalization();
+                        generalization.fromName = umlClass.name;
+                        generalization.toName = interfaceName;
+                        this._umlProgram.generalizations.push(generalization);
+                    });
+                    break;
+                case ts.SyntaxKind.ExtendsKeyword:
+                    h.types.forEach((t) => {
+                        const parentClassName = t.expression.getText();
+                        // Add interface to program if not exists
+                        if (!this._umlProgram.nodes.containsKey(parentClassName)) {
+                            const umlParentClass = new uml.Class(parentClassName);
+                            this._umlProgram.nodes.setValue(parentClassName, umlParentClass);
+                        }
+
+                        const generalization = new uml.Generalization();
+                        generalization.fromName = umlClass.name;
+                        generalization.toName = parentClassName;
+                        this._umlProgram.generalizations.push(generalization);
                     });
                     break;
                 default:

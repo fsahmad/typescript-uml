@@ -1,6 +1,6 @@
 import { UmlLink } from "./umlLink";
 
-export class UmlAssociation extends UmlLink {
+export class UmlGeneralization extends UmlLink {
 
     constructor() {
         super();
