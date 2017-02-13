@@ -1,12 +1,16 @@
 {
   "name": "typescript-uml",
   "version": "0.0.1",
-  "description": "typescript-uml",
+  "description": "TypeScript to UML reverse engineering",
   "license": "MIT",
-  "repository": "",
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fsahmad/typescript-uml.git"
+  },
   "keywords": [
-    ""
+    "typescript",
+    "uml",
+    "delinter"
   ],
   "files": [
     "lib"
