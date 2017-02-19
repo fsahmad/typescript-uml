@@ -3,7 +3,7 @@ import * as mocha from "mocha";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
 import * as Formatter from "../../src/formatter/index";
-import * as Uml from "../../src/index";
+import * as Uml from "../../src/uml";
 
 const expect = chai.expect;
 chai.use(sinonChai);
