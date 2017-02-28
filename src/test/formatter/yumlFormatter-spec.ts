@@ -2,8 +2,8 @@ import * as chai from "chai";
 import * as mocha from "mocha";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
-import * as Formatter from "../../src/formatter/index";
-import * as Uml from "../../src/uml";
+import * as Formatter from "../../formatter/index";
+import * as Uml from "../../uml";
 
 const expect = chai.expect;
 chai.use(sinonChai);

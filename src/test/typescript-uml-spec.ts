@@ -3,10 +3,10 @@ import * as mocha from "mocha";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
 import * as ts from "typescript";
-import { Delinter } from "../src/delint";
-import * as Formatter from "../src/formatter/index";
-import { ITypeScriptUmlOptions, TypeScriptUml } from "../src/main";
-import * as Uml from "../src/uml";
+import { Delinter } from "../delint";
+import * as Formatter from "../formatter/index";
+import * as tsUml from "../typescript-uml";
+import * as Uml from "../uml";
 
 const expect = chai.expect;
 chai.use(sinonChai);
@@ -36,7 +36,7 @@ describe("TypeScriptUml", () => {
         });
 
         const executeCut = () => {
-            returnValue = TypeScriptUml.parseUmlProgram(filenames, scriptTarget);
+            returnValue = tsUml.TypeScriptUml.parseUmlProgram(filenames, scriptTarget);
         };
 
         it("should handle no files", () => {
@@ -70,10 +70,10 @@ describe("TypeScriptUml", () => {
 
     describe(".generateClassDiagram", () => {
         let program: Uml.Program;
-        let options: ITypeScriptUmlOptions;
+        let options: tsUml.ITypeScriptUmlOptions;
 
         const executeCut = () => {
-            return TypeScriptUml.generateClassDiagram(program, options);
+            return tsUml.TypeScriptUml.generateClassDiagram(program, options);
         };
 
         beforeEach(() => {

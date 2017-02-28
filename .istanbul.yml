@@ -1,6 +1,6 @@
 verbose: false
 instrumentation:
-    root: src
+    root: ./src
     extensions:
         - .ts
     default-excludes: false

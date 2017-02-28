@@ -2,8 +2,8 @@ import * as chai from "chai";
 import { readFileSync } from "fs";
 import "mocha";
 import * as ts from "typescript";
-import { Delinter } from "../src/delint";
-import * as uml from "../src/uml";
+import { Delinter } from "../delint";
+import * as uml from "../uml";
 const expect = chai.expect;
 
 describe("Delinter", () => {
