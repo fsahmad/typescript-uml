@@ -12,14 +12,11 @@
     "uml",
     "delinter"
   ],
-  "files": [
-    "lib"
-  ],
   "main": "lib/typescript-uml.js",
   "typings": "lib/typescript-uml.d.ts",
   "scripts": {
     "clean": "rimraf lib",
-    "lint": "tslint --format verbose \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "tslint --format verbose \"src/**/*.ts\"",
     "build": "npm run clean && npm run lint && echo Using TypeScript && tsc --version && tsc --pretty",
     "test": "npm run build && mocha --compilers ts:ts-node/register --recursive 'src/**/*-spec.ts'",
     "watch": "npm run build -- --watch",

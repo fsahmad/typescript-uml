@@ -1,0 +1,13 @@
+.DS_Store
+.editorconfig
+.npmignore
+.vscode/
+tsconfig.json
+tslint.json
+*.yml
+coverage/
+lib/test/
+node_modules/
+npm-debug.log*
+src/
+testInput/
