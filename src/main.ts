@@ -14,7 +14,7 @@ export class TypeScriptUml {
      * Parse the source files in a TypeScript project
      *
      * @static
-     * @param {string} rootPath Project root path, if tsConfigPath is not defined, the tsconfig.json file 
+     * @param {string} rootPath Project root path, if tsConfigPath is not defined, the tsconfig.json file
      * will be searched in this directory
      * @param {string} [tsConfigPath] (Optional) Path to tsconfig.json file
      * @returns {uml.Program} The parse results
