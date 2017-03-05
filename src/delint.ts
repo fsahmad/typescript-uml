@@ -84,6 +84,7 @@ export class Delinter {
                             this._umlProgram.generalizations.push(generalization);
                         });
                         break;
+                    /* istanbul ignore next: default case never reached */
                     default:
                         break;
                 }

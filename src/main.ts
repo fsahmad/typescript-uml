@@ -91,6 +91,7 @@ export class TypeScriptUml {
         return _formatter.generateClassDiagram(program);
     }
 
+    /* istanbul ignore next: code only used by TypeScript API, which is mocked during tests */
     private static _defaultFormatDiagnosticsHost: ts.FormatDiagnosticsHost = {
         getCanonicalFileName: (fileName: string) => {
             return ts.sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase();
