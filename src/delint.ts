@@ -7,6 +7,13 @@ export class Delinter {
 
     private _umlProgram: uml.Program;
 
+    /**
+     * Uml program description filled by the parse method(s)
+     *
+     * @readonly
+     * @type {uml.Program}
+     * @memberOf Delinter
+     */
     public get umlProgram(): uml.Program {
         return this._umlProgram;
     }
@@ -15,6 +22,13 @@ export class Delinter {
         this._umlProgram = new uml.Program();
     }
 
+    /**
+     * Delint a TypeScript source file, adding the parsed elements to umlProgram.
+     *
+     * @param {ts.SourceFile} file TypeScript source file
+     *
+     * @memberOf Delinter
+     */
     public parse(file: ts.SourceFile) {
         this._delintNode(file);
     }
@@ -37,42 +51,44 @@ export class Delinter {
         const umlClass = new uml.Class(node.name.getText());
         this._umlProgram.nodes.setValue(umlClass.name, umlClass);
 
-        node.heritageClauses.forEach((h) => {
-            switch (h.token) {
-                case ts.SyntaxKind.ImplementsKeyword:
-                    h.types.forEach((t) => {
-                        const interfaceName = t.expression.getText();
-                        // Add interface to program if not exists
-                        if (!this._umlProgram.nodes.containsKey(interfaceName)) {
-                            const umlInterface = new uml.Interface(interfaceName);
-                            this._umlProgram.nodes.setValue(interfaceName, umlInterface);
-                        }
+        if (node.heritageClauses) {
+            node.heritageClauses.forEach((h) => {
+                switch (h.token) {
+                    case ts.SyntaxKind.ImplementsKeyword:
+                        h.types.forEach((t) => {
+                            const interfaceName = t.expression.getText();
+                            // Add interface to program if not exists
+                            if (!this._umlProgram.nodes.containsKey(interfaceName)) {
+                                const umlInterface = new uml.Interface(interfaceName);
+                                this._umlProgram.nodes.setValue(interfaceName, umlInterface);
+                            }
 
-                        const generalization = new uml.Generalization();
-                        generalization.fromName = umlClass.name;
-                        generalization.toName = interfaceName;
-                        this._umlProgram.generalizations.push(generalization);
-                    });
-                    break;
-                case ts.SyntaxKind.ExtendsKeyword:
-                    h.types.forEach((t) => {
-                        const parentClassName = t.expression.getText();
-                        // Add interface to program if not exists
-                        if (!this._umlProgram.nodes.containsKey(parentClassName)) {
-                            const umlParentClass = new uml.Class(parentClassName);
-                            this._umlProgram.nodes.setValue(parentClassName, umlParentClass);
-                        }
+                            const generalization = new uml.Generalization();
+                            generalization.fromName = umlClass.name;
+                            generalization.toName = interfaceName;
+                            this._umlProgram.generalizations.push(generalization);
+                        });
+                        break;
+                    case ts.SyntaxKind.ExtendsKeyword:
+                        h.types.forEach((t) => {
+                            const parentClassName = t.expression.getText();
+                            // Add interface to program if not exists
+                            if (!this._umlProgram.nodes.containsKey(parentClassName)) {
+                                const umlParentClass = new uml.Class(parentClassName);
+                                this._umlProgram.nodes.setValue(parentClassName, umlParentClass);
+                            }
 
-                        const generalization = new uml.Generalization();
-                        generalization.fromName = umlClass.name;
-                        generalization.toName = parentClassName;
-                        this._umlProgram.generalizations.push(generalization);
-                    });
-                    break;
-                default:
-                    break;
-            }
-        });
+                            const generalization = new uml.Generalization();
+                            generalization.fromName = umlClass.name;
+                            generalization.toName = parentClassName;
+                            this._umlProgram.generalizations.push(generalization);
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
     }
 
     private _delintInterfaceDeclaration(node: ts.InterfaceDeclaration) {

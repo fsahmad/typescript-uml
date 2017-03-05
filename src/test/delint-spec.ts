@@ -12,11 +12,38 @@ describe("Delinter", () => {
 
     describe("#parse", () => {
         const TEST_FILE_CLASS = "testInput/delint/class.test.ts";
+        const TEST_FILE_CLASS_HERITAGE = "testInput/delint/classHeritage.test.ts";
         const TEST_FILE_INTERFACE = "testInput/delint/interface.test.ts";
 
         describe("given class.test.ts", () => {
             before(() => {
                 sourceFile = ts.createSourceFile(TEST_FILE_CLASS, readFileSync(TEST_FILE_CLASS).toString(),
+                    ts.ScriptTarget.ES5, /*setParentNodes */ true);
+            });
+
+            beforeEach(() => {
+                delinter = new Delinter();
+            });
+
+            it("should add class to uml program", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.nodes.containsKey("Foo")).to.be.true;
+                expect(delinter.umlProgram.nodes.getValue("Foo")).to.be.instanceof(uml.Class);
+            });
+
+            it("should replace existing definition of same class", () => {
+                const classBar = new uml.Class("Foo");
+                delinter.umlProgram.nodes.setValue("Foo", classBar);
+
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.nodes.getValue("Foo")).not.to.equal(classBar);
+            });
+        });
+
+        describe("given classHeritage.test.ts", () => {
+            before(() => {
+                sourceFile = ts.createSourceFile(TEST_FILE_CLASS_HERITAGE,
+                    readFileSync(TEST_FILE_CLASS_HERITAGE).toString(),
                     ts.ScriptTarget.ES5, /*setParentNodes */ true);
             });
 
@@ -62,6 +89,14 @@ describe("Delinter", () => {
                 expect(delinter.umlProgram.nodes.getValue("Bar")).to.be.instanceof(uml.Class);
             });
 
+            it("should replace existing definition of same class", () => {
+                const classBar = new uml.Class("Foo");
+                delinter.umlProgram.nodes.setValue("Foo", classBar);
+
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.nodes.getValue("Foo")).not.to.equal(classBar);
+            });
+
             it("should not replace existing classes", () => {
                 const classBar = new uml.Class("Bar");
                 delinter.umlProgram.nodes.setValue("Bar", classBar);
@@ -76,23 +111,23 @@ describe("Delinter", () => {
                     return value.fromName === "Foo" && value.toName === "Bar";
                 })).to.have.length(1, "Missing generalization from Foo to Bar");
             });
+        });
 
-            describe("given interface.test.ts", () => {
-                before(() => {
-                    sourceFile = ts.createSourceFile(TEST_FILE_INTERFACE, readFileSync(TEST_FILE_INTERFACE).toString(),
-                        ts.ScriptTarget.ES5, /*setParentNodes */ true);
-                });
-
-                beforeEach(() => {
-                    delinter = new Delinter();
-                });
-
-                it("should add interface to uml program", () => {
-                    delinter.parse(sourceFile);
-                    expect(delinter.umlProgram.nodes.containsKey("IBar")).to.be.true;
-                });
+        describe("given interface.test.ts", () => {
+            before(() => {
+                sourceFile = ts.createSourceFile(TEST_FILE_INTERFACE, readFileSync(TEST_FILE_INTERFACE).toString(),
+                    ts.ScriptTarget.ES5, /*setParentNodes */ true);
             });
 
+            beforeEach(() => {
+                delinter = new Delinter();
+            });
+
+            it("should add interface to uml program", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlProgram.nodes.containsKey("IBar")).to.be.true;
+            });
         });
+
     });
 });

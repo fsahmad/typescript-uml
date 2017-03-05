@@ -1,3 +1,3 @@
-class Foo extends Bar implements IBar, IFoo {
+class Foo {
     // Test class
 }
