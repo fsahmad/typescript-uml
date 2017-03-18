@@ -1,7 +1,7 @@
-export { UmlAssociation as Association } from "./umlAssociation";
-export { UmlGeneralization as Generalization } from "./umlGeneralization";
-export { UmlLink as Link } from "./umlLink";
-export { UmlNode as Node } from "./umlNode";
-export { UmlClass as Class } from "./umlClass";
-export { UmlInterface as Interface } from "./umlInterface";
-export { UmlProgram as Program, UmlNodeDict as ClassDict } from "./umlProgram";
+export { Association } from "./association";
+export { Generalization } from "./generalization";
+export { Link } from "./link";
+export { Node } from "./node";
+export { Class } from "./class";
+export { Interface } from "./interface";
+export { CodeModel, NodeDict as ClassDict } from "./codeModel";

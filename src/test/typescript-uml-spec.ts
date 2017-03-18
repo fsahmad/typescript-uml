@@ -25,7 +25,7 @@ describe("TypeScriptUml", () => {
     describe(".parseProject", () => {
         let root: string;
         let tsConfigPath: string;
-        let returnValue: Uml.Program;
+        let returnValue: Uml.CodeModel;
         let findConfigFileStub: sinon.SinonStub;
         let readConfigFileStub: sinon.SinonStub;
         let formatDiagnosticsStub: sinon.SinonStub;
@@ -64,9 +64,9 @@ describe("TypeScriptUml", () => {
             });
         });
 
-        it("should return instance of uml.Program", () => {
+        it("should return instance of uml.CodeModel", () => {
             executeCut();
-            expect(returnValue).to.be.instanceOf(Uml.Program);
+            expect(returnValue).to.be.instanceOf(Uml.CodeModel);
         });
 
         it("should find config file if tsConfigPath is undefined", () => {
@@ -138,7 +138,7 @@ describe("TypeScriptUml", () => {
         let fileName: string;
         let target: ts.ScriptTarget;
         let delinter: Delinter;
-        let returnValue: Uml.Program;
+        let returnValue: Uml.CodeModel;
         let parseStub: sinon.SinonStub;
         let createSourceFileSpy: sinon.SinonSpy;
 
@@ -165,34 +165,34 @@ describe("TypeScriptUml", () => {
                 }));
         });
 
-        it("should return instance of uml.Program", () => {
+        it("should return instance of uml.CodeModel", () => {
             fileName = "testInput/delint/class.test.ts";
             executeCut();
-            expect(returnValue).to.be.instanceOf(Uml.Program);
+            expect(returnValue).to.be.instanceOf(Uml.CodeModel);
         });
     });
 
     describe(".generateClassDiagram", () => {
-        let program: Uml.Program;
+        let codeModel: Uml.CodeModel;
         let options: tsUml.ITypeScriptUmlOptions;
 
         const executeCut = () => {
-            return tsUml.TypeScriptUml.generateClassDiagram(program, options);
+            return tsUml.TypeScriptUml.generateClassDiagram(codeModel, options);
         };
 
         beforeEach(() => {
-            program = new Uml.Program();
+            codeModel = new Uml.CodeModel();
             options = {
                 formatter: "yuml",
             };
         });
 
-        it("should call formatter with program", () => {
+        it("should call formatter with code model", () => {
             const spy = sandbox.spy(Formatter.YumlFormatter.prototype, "generateClassDiagram");
             const returnValue = executeCut();
             expect(spy)
                 .to.have.been.calledOnce
-                .and.calledWith(program)
+                .and.calledWith(codeModel)
                 .and.returned(returnValue);
         });
     });

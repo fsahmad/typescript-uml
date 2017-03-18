@@ -25,18 +25,18 @@ describe("Delinter", () => {
                 delinter = new Delinter();
             });
 
-            it("should add class to uml program", () => {
+            it("should add class to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.containsKey("Foo")).to.be.true;
-                expect(delinter.umlProgram.nodes.getValue("Foo")).to.be.instanceof(uml.Class);
+                expect(delinter.umlCodeModel.nodes.containsKey("Foo")).to.be.true;
+                expect(delinter.umlCodeModel.nodes.getValue("Foo")).to.be.instanceof(uml.Class);
             });
 
             it("should replace existing definition of same class", () => {
                 const classBar = new uml.Class("Foo");
-                delinter.umlProgram.nodes.setValue("Foo", classBar);
+                delinter.umlCodeModel.nodes.setValue("Foo", classBar);
 
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.getValue("Foo")).not.to.equal(classBar);
+                expect(delinter.umlCodeModel.nodes.getValue("Foo")).not.to.equal(classBar);
             });
         });
 
@@ -51,63 +51,63 @@ describe("Delinter", () => {
                 delinter = new Delinter();
             });
 
-            it("should add class to uml program", () => {
+            it("should add class to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.containsKey("Foo")).to.be.true;
-                expect(delinter.umlProgram.nodes.getValue("Foo")).to.be.instanceof(uml.Class);
+                expect(delinter.umlCodeModel.nodes.containsKey("Foo")).to.be.true;
+                expect(delinter.umlCodeModel.nodes.getValue("Foo")).to.be.instanceof(uml.Class);
             });
 
-            it("should add interfaces to uml program", () => {
+            it("should add interfaces to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.containsKey("IBar")).to.be.true;
-                expect(delinter.umlProgram.nodes.containsKey("IFoo")).to.be.true;
-                expect(delinter.umlProgram.nodes.getValue("IBar")).to.be.instanceof(uml.Interface);
-                expect(delinter.umlProgram.nodes.getValue("IFoo")).to.be.instanceof(uml.Interface);
+                expect(delinter.umlCodeModel.nodes.containsKey("IBar")).to.be.true;
+                expect(delinter.umlCodeModel.nodes.containsKey("IFoo")).to.be.true;
+                expect(delinter.umlCodeModel.nodes.getValue("IBar")).to.be.instanceof(uml.Interface);
+                expect(delinter.umlCodeModel.nodes.getValue("IFoo")).to.be.instanceof(uml.Interface);
             });
 
             it("should not replace existing interfaces", () => {
                 const interfaceIBar = new uml.Interface("IBar");
-                delinter.umlProgram.nodes.setValue("IBar", interfaceIBar);
+                delinter.umlCodeModel.nodes.setValue("IBar", interfaceIBar);
 
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.getValue("IBar")).to.equal(interfaceIBar);
+                expect(delinter.umlCodeModel.nodes.getValue("IBar")).to.equal(interfaceIBar);
             });
 
-            it("should add interface generalizations to uml program", () => {
+            it("should add interface generalizations to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.generalizations.filter((value) => {
+                expect(delinter.umlCodeModel.generalizations.filter((value) => {
                     return value.fromName === "Foo" && value.toName === "IBar";
                 })).to.have.length(1, "Missing generalization from Foo to IBar");
-                expect(delinter.umlProgram.generalizations.filter((value) => {
+                expect(delinter.umlCodeModel.generalizations.filter((value) => {
                     return value.fromName === "Foo" && value.toName === "IFoo";
                 })).to.have.length(1, "Missing generalization from Foo to IFoo");
             });
 
-            it("should add parent class to uml program", () => {
+            it("should add parent class to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.containsKey("Bar")).to.be.true;
-                expect(delinter.umlProgram.nodes.getValue("Bar")).to.be.instanceof(uml.Class);
+                expect(delinter.umlCodeModel.nodes.containsKey("Bar")).to.be.true;
+                expect(delinter.umlCodeModel.nodes.getValue("Bar")).to.be.instanceof(uml.Class);
             });
 
             it("should replace existing definition of same class", () => {
                 const classBar = new uml.Class("Foo");
-                delinter.umlProgram.nodes.setValue("Foo", classBar);
+                delinter.umlCodeModel.nodes.setValue("Foo", classBar);
 
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.getValue("Foo")).not.to.equal(classBar);
+                expect(delinter.umlCodeModel.nodes.getValue("Foo")).not.to.equal(classBar);
             });
 
             it("should not replace existing classes", () => {
                 const classBar = new uml.Class("Bar");
-                delinter.umlProgram.nodes.setValue("Bar", classBar);
+                delinter.umlCodeModel.nodes.setValue("Bar", classBar);
 
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.getValue("Bar")).to.equal(classBar);
+                expect(delinter.umlCodeModel.nodes.getValue("Bar")).to.equal(classBar);
             });
 
-            it("should add extension generalizations to uml program", () => {
+            it("should add extension generalizations to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.generalizations.filter((value) => {
+                expect(delinter.umlCodeModel.generalizations.filter((value) => {
                     return value.fromName === "Foo" && value.toName === "Bar";
                 })).to.have.length(1, "Missing generalization from Foo to Bar");
             });
@@ -123,9 +123,9 @@ describe("Delinter", () => {
                 delinter = new Delinter();
             });
 
-            it("should add interface to uml program", () => {
+            it("should add interface to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlProgram.nodes.containsKey("IBar")).to.be.true;
+                expect(delinter.umlCodeModel.nodes.containsKey("IBar")).to.be.true;
             });
         });
 

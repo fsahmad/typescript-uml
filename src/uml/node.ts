@@ -1,5 +1,5 @@
 
-export class UmlNode {
+export class Node {
     private _name: string;
 
     public get name(): string {

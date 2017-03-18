@@ -17,11 +17,11 @@ export class TypeScriptUml {
      * @param {string} rootPath Project root path, if tsConfigPath is not defined, the tsconfig.json file
      * will be searched in this directory
      * @param {string} [tsConfigPath] (Optional) Path to tsconfig.json file
-     * @returns {uml.Program} The parse results
+     * @returns {uml.CodeModel} The parse results
      *
      * @memberOf TypeScriptUml
      */
-    public static parseProject(rootPath: string, tsConfigPath?: string): uml.Program {
+    public static parseProject(rootPath: string, tsConfigPath?: string): uml.CodeModel {
         const tsConfig = this._readTsconfig(rootPath, tsConfigPath);
 
         const delinter = new Delinter();
@@ -30,7 +30,7 @@ export class TypeScriptUml {
             this.parseFile(f, tsConfig.options.target, delinter);
         }
 
-        return delinter.umlProgram;
+        return delinter.umlCodeModel;
     }
 
     /**
@@ -40,11 +40,11 @@ export class TypeScriptUml {
      * @param {string} fileName Source file to parse
      * @param {ts.ScriptTarget} target TypeScript compiler script target
      * @param {Delinter} [delinter] (Optional) Delinter instance to use for delinting
-     * @returns {uml.Program} The parse results
+     * @returns {uml.CodeModel} The parse results
      *
      * @memberOf TypeScriptUml
      */
-    public static parseFile(fileName: string, target: ts.ScriptTarget, delinter?: Delinter): uml.Program {
+    public static parseFile(fileName: string, target: ts.ScriptTarget, delinter?: Delinter): uml.CodeModel {
         if (!delinter) {
             delinter = new Delinter();
         }
@@ -54,20 +54,20 @@ export class TypeScriptUml {
 
         delinter.parse(sourceFile);
 
-        return delinter.umlProgram;
+        return delinter.umlCodeModel;
     }
 
     /**
-     * Generate a uml class diagram from a uml program description.
+     * Generate a uml class diagram from a uml CodeModel description.
      *
      * @static
-     * @param {uml.Program} program Uml program description
+     * @param {uml.CodeModel} codeModel Uml CodeModel description
      * @param {ITypeScriptUmlOptions} [options] Options
      * @returns {string} Class diagram formatted according to the specified options
      *
      * @memberOf TypeScriptUml
      */
-    public static generateClassDiagram(program: uml.Program, options?: ITypeScriptUmlOptions): string {
+    public static generateClassDiagram(codeModel: uml.CodeModel, options?: ITypeScriptUmlOptions): string {
         let _formatter: formatter.AbstractFormatter = null;
         const defaultOptions: ITypeScriptUmlOptions = {
             formatter: "yuml",
@@ -88,7 +88,7 @@ export class TypeScriptUml {
             default:
                 throw new Error(`Unknown formatter ${options.formatter}`);
         }
-        return _formatter.generateClassDiagram(program);
+        return _formatter.generateClassDiagram(codeModel);
     }
 
     /* istanbul ignore next: code only used by TypeScript API, which is mocked during tests */

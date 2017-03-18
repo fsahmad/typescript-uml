@@ -1,5 +1,5 @@
 
-export class UmlLink {
+export class Link {
     private _fromName: string;
     private _toName: string;
 

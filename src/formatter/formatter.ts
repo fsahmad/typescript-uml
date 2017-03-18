@@ -13,14 +13,14 @@ export class AbstractFormatter {
     }
 
     /**
-     * Generate class diagram for uml program data
+     * Generate class diagram for uml code model data
      *
-     * @param {uml.Program} umlProgram Uml program data
+     * @param {uml.CodeModel} umlCodeModel Uml code model data
      * @returns {string} Class diagram according to format
      *
      * @memberOf Formatter
      */
-    public generateClassDiagram(umlProgram: uml.Program): string {
+    public generateClassDiagram(umlCodeModel: uml.CodeModel): string {
         return "";
     }
 }
