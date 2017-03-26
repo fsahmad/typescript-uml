@@ -41,9 +41,12 @@ export class Formatter extends AbstractFormatter {
 
     private _formatNode(node: uml.Node): string {
         if (node instanceof uml.Class) {
-            return `[${node.name}]`;
-        } else if (node instanceof uml.Interface) {
-            return `[<<${node.name}>>]`;
+            switch (node.stereotype) {
+                case uml.Stereotype.Interface:
+                    return `[<<${node.name}>>]`;
+                default:
+                    return `[${node.name}]`;
+            }
         }
     }
 }

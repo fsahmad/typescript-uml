@@ -61,12 +61,14 @@ describe("Delinter", () => {
                 delinter.parse(sourceFile);
                 expect(delinter.umlCodeModel.nodes.containsKey("IBar")).to.be.true;
                 expect(delinter.umlCodeModel.nodes.containsKey("IFoo")).to.be.true;
-                expect(delinter.umlCodeModel.nodes.getValue("IBar")).to.be.instanceof(uml.Interface);
-                expect(delinter.umlCodeModel.nodes.getValue("IFoo")).to.be.instanceof(uml.Interface);
+                expect(delinter.umlCodeModel.nodes.getValue("IBar")).to.be.instanceof(uml.Class);
+                expect(delinter.umlCodeModel.nodes.getValue("IBar").stereotype).to.equal(uml.Stereotype.Interface);
+                expect(delinter.umlCodeModel.nodes.getValue("IFoo")).to.be.instanceof(uml.Class);
+                expect(delinter.umlCodeModel.nodes.getValue("IFoo").stereotype).to.equal(uml.Stereotype.Interface);
             });
 
             it("should not replace existing interfaces", () => {
-                const interfaceIBar = new uml.Interface("IBar");
+                const interfaceIBar = new uml.Class("IBar", uml.Stereotype.Interface);
                 delinter.umlCodeModel.nodes.setValue("IBar", interfaceIBar);
 
                 delinter.parse(sourceFile);

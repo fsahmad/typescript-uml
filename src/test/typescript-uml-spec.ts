@@ -184,7 +184,7 @@ describe("TypeScriptUml", () => {
             codeModel = new Uml.CodeModel();
             codeModel.nodes.setValue("Foo", new Uml.Class("Foo"));
             codeModel.nodes.setValue("Bar", new Uml.Class("Bar"));
-            codeModel.nodes.setValue("Baz", new Uml.Interface("Baz"));
+            codeModel.nodes.setValue("Baz", new Uml.Class("Baz", Uml.Stereotype.Interface));
             codeModel.nodes.setValue("Qux", new Uml.Class("Qux"));
 
             codeModel.associations.push(new Uml.Association("Foo", "Bar"));

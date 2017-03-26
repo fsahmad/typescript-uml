@@ -59,7 +59,7 @@ export class Delinter {
                             const interfaceName = t.expression.getText();
                             // Add interface to CodeModel if not exists
                             if (!this._umlCodeModel.nodes.containsKey(interfaceName)) {
-                                const umlInterface = new uml.Interface(interfaceName);
+                                const umlInterface = new uml.Class(interfaceName, uml.Stereotype.Interface);
                                 this._umlCodeModel.nodes.setValue(interfaceName, umlInterface);
                             }
 
@@ -89,7 +89,7 @@ export class Delinter {
     }
 
     private _delintInterfaceDeclaration(node: ts.InterfaceDeclaration) {
-        const umlInterface = new uml.Interface(node.name.getText());
+        const umlInterface = new uml.Class(node.name.getText(), uml.Stereotype.Interface);
         this._umlCodeModel.nodes.setValue(umlInterface.name, umlInterface);
     }
 

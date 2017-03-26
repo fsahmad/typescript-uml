@@ -50,8 +50,8 @@ describe("YumlFormatter", () => {
         });
 
         it("should handle uml code model with unassociated interfaces", () => {
-            const foo = new Uml.Interface("Foo");
-            const bar = new Uml.Interface("Bar");
+            const foo = new Uml.Class("Foo", Uml.Stereotype.Interface);
+            const bar = new Uml.Class("Bar", Uml.Stereotype.Interface);
             umlCodeModel.nodes.setValue(foo.name, foo);
             umlCodeModel.nodes.setValue(bar.name, bar);
 
@@ -79,7 +79,7 @@ describe("YumlFormatter", () => {
 
         it("should handle uml code model with interface inheritance", () => {
             const foo = new Uml.Class("Foo");
-            const bar = new Uml.Interface("IBar");
+            const bar = new Uml.Class("IBar", Uml.Stereotype.Interface);
             umlCodeModel.nodes.setValue(foo.name, foo);
             umlCodeModel.nodes.setValue(bar.name, bar);
 
@@ -94,7 +94,7 @@ describe("YumlFormatter", () => {
 
         it("should not output classes separately when outputted as link", () => {
             const foo = new Uml.Class("Foo");
-            const bar = new Uml.Interface("IBar");
+            const bar = new Uml.Class("IBar", Uml.Stereotype.Interface);
             umlCodeModel.nodes.setValue(foo.name, foo);
             umlCodeModel.nodes.setValue(bar.name, bar);
 
