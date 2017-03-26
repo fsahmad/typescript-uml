@@ -199,6 +199,24 @@ export class TypeScriptUml {
     private static _createIncludeCodeModel(
         codeModel: uml.CodeModel, include: string[], exclude: string[]): uml.CodeModel {
         const newCodeModel = new uml.CodeModel();
+        if (exclude === null || exclude === undefined) {
+            exclude = [];
+        }
+
+        codeModel.nodes.forEach((key, node) => {
+            if (this._isIncluded(node, include) && !this._isExcluded(node, exclude)) {
+                newCodeModel.nodes.setValue(key, codeModel.nodes.getValue(key));
+            }
+        });
+
+        newCodeModel.associations = codeModel.associations.filter((association) => {
+            return this._isIncluded(association, include) && !this._isExcluded(association, exclude);
+        });
+
+        newCodeModel.generalizations = codeModel.generalizations.filter((generalization) => {
+            return this._isIncluded(generalization, include) && !this._isExcluded(generalization, exclude);
+        });
+
         return newCodeModel;
     }
 
@@ -206,27 +224,49 @@ export class TypeScriptUml {
         codeModel: uml.CodeModel, exclude: string[]): uml.CodeModel {
         const newCodeModel = new uml.CodeModel();
 
-        codeModel.nodes.keys().filter((key) => {
-            return exclude.find((value) => {
-                return value === codeModel.nodes.getValue(key).name;
-            }) === undefined;
-        }).forEach((key) => {
-            newCodeModel.nodes.setValue(key, codeModel.nodes.getValue(key));
+        codeModel.nodes.forEach((key, node) => {
+            if (!this._isExcluded(node, exclude)) {
+                newCodeModel.nodes.setValue(key, codeModel.nodes.getValue(key));
+            }
         });
 
         newCodeModel.associations = codeModel.associations.filter((association) => {
-            return exclude.find((value) => {
-                return value === association.fromName || value === association.toName;
-            }) === undefined;
+            return !this._isExcluded(association, exclude);
         });
 
         newCodeModel.generalizations = codeModel.generalizations.filter((generalization) => {
-            return exclude.find((value) => {
-                return value === generalization.fromName || value === generalization.toName;
-            }) === undefined;
+            return !this._isExcluded(generalization, exclude);
         });
 
         return newCodeModel;
+    }
+
+    private static _isIncluded(object: uml.Node | uml.Link, include: string[]): boolean {
+        const node: uml.Node = object instanceof uml.Node ? object as uml.Node : null;
+        const link: uml.Link = object instanceof uml.Link ? object as uml.Link : null;
+
+        if (node) {
+            return include.find((value) => {
+                return node.name === value;
+
+            }) !== undefined;
+        } else if (link) {
+            return include.find((value) => value === link.fromName) !== undefined &&
+                include.find((value) => value === link.toName) !== undefined;
+        }
+    }
+
+    private static _isExcluded(object: uml.Node | uml.Link, exclude: string[]): boolean {
+        const node: uml.Node = object instanceof uml.Node ? object as uml.Node : null;
+        const link: uml.Link = object instanceof uml.Link ? object as uml.Link : null;
+
+        return exclude.find((value) => {
+            if (node) {
+                return node.name === value;
+            } else if (link) {
+                return link.fromName === value || link.toName === value;
+            }
+        }) !== undefined;
     }
 
     private constructor() {
