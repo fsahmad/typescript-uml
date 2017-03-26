@@ -4,8 +4,47 @@ import { Delinter } from "./delint";
 import * as formatter from "./formatter/index";
 import * as uml from "./uml/index";
 
-export interface ITypeScriptUmlOptions {
+export interface IClassDiagramOptions {
+    /**
+     * Formatter to use to generate diagram
+     *
+     * @type {"yuml"}
+     * @memberOf IClassDiagramOptions
+     */
     formatter?: "yuml";
+
+    /**
+     * Options for nodes
+     *
+     * @type {{
+     *         include?: string[];
+     *         exclude?: string[];
+     *     }}
+     * @memberOf IClassDiagramOptions
+     */
+    nodes?: {
+        /**
+         * Nodes to exclude.
+         *
+         * If specified, nodes matching the exclude will not be added to the diagram, nor will
+         * nodes linked to them be added (unless linked to a non-excluded node).
+         *
+         * @type {string[]}
+         */
+        exclude?: string[];
+
+        /**
+         * Nodes to include.
+         *
+         * If specified, only the nodes matching the include will be used as starting points
+         * to search for the nodes to add to the diagram.
+         *
+         * @type {string[]}
+         */
+        include?: string[];
+
+        // depth?: number;
+    };
 }
 
 export class TypeScriptUml {
@@ -67,10 +106,14 @@ export class TypeScriptUml {
      *
      * @memberOf TypeScriptUml
      */
-    public static generateClassDiagram(codeModel: uml.CodeModel, options?: ITypeScriptUmlOptions): string {
+    public static generateClassDiagram(codeModel: uml.CodeModel, options?: IClassDiagramOptions): string {
         let _formatter: formatter.AbstractFormatter = null;
-        const defaultOptions: ITypeScriptUmlOptions = {
+        const defaultOptions: IClassDiagramOptions = {
             formatter: "yuml",
+            nodes: {
+                exclude: null,
+                include: null,
+            },
         };
 
         if (!options) {
@@ -81,6 +124,26 @@ export class TypeScriptUml {
             options.formatter = defaultOptions.formatter;
         }
 
+        if (!options.hasOwnProperty("nodes")) {
+            options.nodes = defaultOptions.nodes;
+        } else {
+            if (!options.nodes.hasOwnProperty("include")) {
+                options.nodes.include = defaultOptions.nodes.include;
+            }
+            if (!options.nodes.hasOwnProperty("exclude")) {
+                options.nodes.exclude = defaultOptions.nodes.exclude;
+            }
+        }
+
+        let diagramCodeModel = codeModel;
+        if (options.nodes.include) {
+            // Include nodes
+            diagramCodeModel = this._createIncludeCodeModel(codeModel, options.nodes.include, options.nodes.exclude);
+        } else if (options.nodes.exclude) {
+            // Exclude nodes
+            diagramCodeModel = this._createExcludeCodeModel(codeModel, options.nodes.exclude);
+        }
+
         switch (options.formatter) {
             case "yuml":
                 _formatter = new formatter.YumlFormatter();
@@ -88,7 +151,7 @@ export class TypeScriptUml {
             default:
                 throw new Error(`Unknown formatter ${options.formatter}`);
         }
-        return _formatter.generateClassDiagram(codeModel);
+        return _formatter.generateClassDiagram(diagramCodeModel);
     }
 
     /* istanbul ignore next: code only used by TypeScript API, which is mocked during tests */
@@ -131,6 +194,39 @@ export class TypeScriptUml {
         }
 
         return parsed;
+    }
+
+    private static _createIncludeCodeModel(
+        codeModel: uml.CodeModel, include: string[], exclude: string[]): uml.CodeModel {
+        const newCodeModel = new uml.CodeModel();
+        return newCodeModel;
+    }
+
+    private static _createExcludeCodeModel(
+        codeModel: uml.CodeModel, exclude: string[]): uml.CodeModel {
+        const newCodeModel = new uml.CodeModel();
+
+        codeModel.nodes.keys().filter((key) => {
+            return exclude.find((value) => {
+                return value === codeModel.nodes.getValue(key).name;
+            }) === undefined;
+        }).forEach((key) => {
+            newCodeModel.nodes.setValue(key, codeModel.nodes.getValue(key));
+        });
+
+        newCodeModel.associations = codeModel.associations.filter((association) => {
+            return exclude.find((value) => {
+                return value === association.fromName || value === association.toName;
+            }) === undefined;
+        });
+
+        newCodeModel.generalizations = codeModel.generalizations.filter((generalization) => {
+            return exclude.find((value) => {
+                return value === generalization.fromName || value === generalization.toName;
+            }) === undefined;
+        });
+
+        return newCodeModel;
     }
 
     private constructor() {

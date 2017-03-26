@@ -63,9 +63,7 @@ export class Delinter {
                                 this._umlCodeModel.nodes.setValue(interfaceName, umlInterface);
                             }
 
-                            const generalization = new uml.Generalization();
-                            generalization.fromName = umlClass.name;
-                            generalization.toName = interfaceName;
+                            const generalization = new uml.Generalization(umlClass.name, interfaceName);
                             this._umlCodeModel.generalizations.push(generalization);
                         });
                         break;
@@ -78,9 +76,7 @@ export class Delinter {
                                 this._umlCodeModel.nodes.setValue(parentClassName, umlParentClass);
                             }
 
-                            const generalization = new uml.Generalization();
-                            generalization.fromName = umlClass.name;
-                            generalization.toName = parentClassName;
+                            const generalization = new uml.Generalization(umlClass.name, parentClassName);
                             this._umlCodeModel.generalizations.push(generalization);
                         });
                         break;

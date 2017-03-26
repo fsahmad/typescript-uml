@@ -19,8 +19,8 @@ export class Link {
         this._toName = value;
     }
 
-    constructor() {
-        this._fromName = null;
-        this._toName = null;
+    constructor(fromName: string, toName: string) {
+        this._fromName = fromName;
+        this._toName = toName;
     }
 }

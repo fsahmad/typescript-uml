@@ -2,7 +2,7 @@ import { Link } from "./link";
 
 export class Generalization extends Link {
 
-    constructor() {
-        super();
+    constructor(fromName: string, toName: string) {
+        super(fromName, toName);
     }
 }

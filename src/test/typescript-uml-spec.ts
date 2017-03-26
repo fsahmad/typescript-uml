@@ -174,7 +174,7 @@ describe("TypeScriptUml", () => {
 
     describe(".generateClassDiagram", () => {
         let codeModel: Uml.CodeModel;
-        let options: tsUml.ITypeScriptUmlOptions;
+        let options: tsUml.IClassDiagramOptions;
 
         const executeCut = () => {
             return tsUml.TypeScriptUml.generateClassDiagram(codeModel, options);
@@ -182,18 +182,81 @@ describe("TypeScriptUml", () => {
 
         beforeEach(() => {
             codeModel = new Uml.CodeModel();
+            codeModel.nodes.setValue("Foo", new Uml.Class("Foo"));
+            codeModel.nodes.setValue("Bar", new Uml.Class("Bar"));
+            codeModel.nodes.setValue("Baz", new Uml.Interface("Baz"));
+            codeModel.nodes.setValue("Qux", new Uml.Class("Qux"));
+
+            codeModel.associations.push(new Uml.Association("Foo", "Bar"));
+            codeModel.associations.push(new Uml.Association("Bar", "Baz"));
+            codeModel.associations.push(new Uml.Association("Qux", "Baz"));
+            codeModel.generalizations.push(new Uml.Generalization("Foo", "Baz"));
+            codeModel.generalizations.push(new Uml.Generalization("Qux", "Bar"));
+
             options = {
                 formatter: "yuml",
             };
         });
 
-        it("should call formatter with code model", () => {
+        it("should call formatter with code model and return result", () => {
             const spy = sandbox.spy(Formatter.YumlFormatter.prototype, "generateClassDiagram");
             const returnValue = executeCut();
             expect(spy)
                 .to.have.been.calledOnce
-                .and.calledWith(codeModel)
+                .and.calledWith(sinon.match.instanceOf(Uml.CodeModel))
                 .and.returned(returnValue);
+            expect(spy.firstCall.args[0])
+                .to.deep.equal(codeModel);
         });
+
+        it("should throw Error for unknown formatter", () => {
+            (options as any).formatter = "non-existing-formatter";
+            expect(executeCut).to.throw(/non-existing-formatter/);
+        });
+
+        it("should remove excluded nodes from code model", () => {
+            options.nodes = {
+                exclude: ["Bar"],
+            };
+
+            const spy = sandbox.spy(Formatter.YumlFormatter.prototype, "generateClassDiagram");
+            const returnValue = executeCut();
+            expect(spy)
+                .to.have.been.calledOnce
+                .and.calledWith(sinon.match.instanceOf(Uml.CodeModel));
+
+            const argCodeModel = spy.firstCall.args[0] as Uml.CodeModel;
+            expect(argCodeModel.nodes.containsKey("Bar")).to.be.false;
+
+            expect(argCodeModel.nodes.containsKey("Foo")).to.be.true;
+            expect(argCodeModel.nodes.containsKey("Baz")).to.be.true;
+            expect(argCodeModel.nodes.containsKey("Qux")).to.be.true;
+
+            expect(argCodeModel.associations).to.eql([codeModel.associations[2]]);
+            expect(argCodeModel.generalizations).to.eql([codeModel.generalizations[0]]);
+        });
+
+        it("should only add include nodes in code model for formatter", () => {
+            options.nodes = {
+                include: ["Bar"],
+            };
+
+            const spy = sandbox.spy(Formatter.YumlFormatter.prototype, "generateClassDiagram");
+            const returnValue = executeCut();
+            expect(spy)
+                .to.have.been.calledOnce
+                .and.calledWith(sinon.match.instanceOf(Uml.CodeModel));
+
+            const argCodeModel = spy.firstCall.args[0] as Uml.CodeModel;
+            expect(argCodeModel.nodes.containsKey("Bar")).to.be.true;
+
+            expect(argCodeModel.nodes.containsKey("Foo")).to.be.false;
+            expect(argCodeModel.nodes.containsKey("Baz")).to.be.false;
+            expect(argCodeModel.nodes.containsKey("Qux")).to.be.false;
+
+            expect(argCodeModel.associations).to.eql([]);
+            expect(argCodeModel.generalizations).to.eql([]);
+        });
+
     });
 });
