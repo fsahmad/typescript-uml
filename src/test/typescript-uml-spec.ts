@@ -24,7 +24,7 @@ describe("TypeScriptUml", () => {
 
     describe(".parseProject", () => {
         let root: string;
-        let tsConfigPath: string;
+        let options: tsUml.IParseOptions;
         let returnValue: Uml.CodeModel;
         let findConfigFileStub: sinon.SinonStub;
         let readConfigFileStub: sinon.SinonStub;
@@ -35,12 +35,12 @@ describe("TypeScriptUml", () => {
         let createSourceFileStub: sinon.SinonStub;
 
         const executeCut = () => {
-            returnValue = tsUml.TypeScriptUml.parseProject(root, tsConfigPath);
+            returnValue = tsUml.TypeScriptUml.parseProject(root, options);
         };
 
         beforeEach(() => {
             root = ".";
-            tsConfigPath = undefined;
+            options = {};
 
             findConfigFileStub = sandbox.stub(ts, "findConfigFile");
             findConfigFileStub.returns("tsconfig.json");
@@ -78,7 +78,7 @@ describe("TypeScriptUml", () => {
 
         it("should use tsConfigPath if defined", () => {
             root = "/home/user/project";
-            tsConfigPath = "my/custom/tsconfig.json";
+            options.tsconfig = "my/custom/tsconfig.json";
             executeCut();
             expect(readConfigFileStub).to.have.been.calledWith("my/custom/tsconfig.json");
         });

@@ -4,6 +4,32 @@ import { Delinter } from "./delint";
 import * as formatter from "./formatter/index";
 import * as uml from "./uml/index";
 
+export interface IParseOptions {
+    /**
+     * Files to include (accepts glob patterns)
+     *
+     * @type {string[]}
+     * @memberOf IParseOptions
+     */
+    include?: string[];
+
+    /**
+     * Files to exclude (accept glob patterns)
+     *
+     * @type {string[]}
+     * @memberOf IParseOptions
+     */
+    exclude?: string[];
+
+    /**
+     * Path to typescript config (if not specified, searches for tsconfig.json)
+     *
+     * @type {string}
+     * @memberOf IParseOptions
+     */
+    tsconfig?: string;
+}
+
 export interface IClassDiagramOptions {
     /**
      * Formatter to use to generate diagram
@@ -60,8 +86,10 @@ export class TypeScriptUml {
      *
      * @memberOf TypeScriptUml
      */
-    public static parseProject(rootPath: string, tsConfigPath?: string): uml.CodeModel {
-        const tsConfig = this._readTsconfig(rootPath, tsConfigPath);
+    public static parseProject(rootPath: string, options?: IParseOptions): uml.CodeModel {
+        const _options = this._setDefaultParseOptions(options);
+
+        const tsConfig = this._readTsconfig(rootPath, _options.tsconfig);
 
         const delinter = new Delinter();
 
@@ -162,6 +190,35 @@ export class TypeScriptUml {
         getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
         getNewLine: () => ts.sys.newLine,
     };
+
+    /**
+     * Fill options object with default values for unspecified properties.
+     *
+     * @private
+     * @static
+     * @param {IParseOptions} [options] Options object
+     * @returns {IParseOptions} Options object with default values for unspecified properties
+     *
+     * @memberOf TypeScriptUml
+     */
+    private static _setDefaultParseOptions(options?: IParseOptions): IParseOptions {
+        const defaultOptions: IParseOptions = {
+            exclude: [],
+            include: null,
+            tsconfig: null,
+        };
+
+        if (!options) {
+            options = defaultOptions;
+        }
+
+        Object.keys(defaultOptions).forEach((key) => {
+            if (!options.hasOwnProperty(key)) {
+                (options as any)[key] = (defaultOptions as any)[key];
+            }
+        });
+        return options;
+    }
 
     /**
      * Find and parse the tsconfig.json file for the project in the searchPath.
