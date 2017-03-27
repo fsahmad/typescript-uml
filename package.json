@@ -1,6 +1,6 @@
 {
   "name": "typescript-uml",
-  "version": "0.2.0-dev",
+  "version": "0.2.0",
   "description": "TypeScript to UML reverse engineering",
   "license": "MIT",
   "repository": {
@@ -20,7 +20,7 @@
     "build": "npm run clean && npm run lint && echo Using TypeScript && tsc --version && tsc --pretty",
     "test": "npm run build && mocha --compilers ts:ts-node/register --recursive 'src/**/*-spec.ts'",
     "watch": "npm run build -- --watch",
-    "watch:test": "npm run test -- --watch",    
+    "watch:test": "npm run test -- --watch",
     "test-travis": "ts-node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --compilers ts:ts-node/register -R spec 'src/**/*-spec.ts'"
   },
   "dependencies": {
