@@ -6,7 +6,7 @@ import * as uml from "./uml/index";
 
 export interface IParseOptions {
     /**
-     * Files to include (accepts glob patterns)
+     * Include patterns. If defined, overrides the tsconfig's include property.
      *
      * @type {string[]}
      * @memberOf IParseOptions
@@ -14,7 +14,7 @@ export interface IParseOptions {
     include?: string[];
 
     /**
-     * Files to exclude (accept glob patterns)
+     * Exclude patterns. If defined, adds to the tsconfig's exclude property.
      *
      * @type {string[]}
      * @memberOf IParseOptions
@@ -89,7 +89,7 @@ export class TypeScriptUml {
     public static parseProject(rootPath: string, options?: IParseOptions): uml.CodeModel {
         const _options = this._setDefaultParseOptions(options);
 
-        const tsConfig = this._readTsconfig(rootPath, _options.tsconfig);
+        const tsConfig = this._readTsconfig(rootPath, _options);
 
         const delinter = new Delinter();
 
@@ -226,13 +226,13 @@ export class TypeScriptUml {
      * @private
      * @static
      * @param {string} searchPath Base search path to look for the tsconfig
-     * @param {string} [tsConfigPath] Path of the tsconfig.json file to parse (optional)
+     * @param {string} options Path of the tsconfig.json file to parse (optional)
      * @returns {ts.ParsedCommandLine} The parse results
      *
      * @memberOf TypeScriptUml
      */
-    private static _readTsconfig(searchPath: string, tsConfigPath?: string): ts.ParsedCommandLine {
-        const configPath = tsConfigPath ? tsConfigPath : ts.findConfigFile(searchPath, existsSync);
+    private static _readTsconfig(searchPath: string, options: IParseOptions): ts.ParsedCommandLine {
+        const configPath = options.tsconfig ? options.tsconfig : ts.findConfigFile(searchPath, existsSync);
 
         const config = ts.readConfigFile(configPath, (path) => {
             return readFileSync(path).toString();
@@ -241,6 +241,18 @@ export class TypeScriptUml {
         if (config.error) {
             const formattedDiagnostic = ts.formatDiagnostics([config.error], this._defaultFormatDiagnosticsHost);
             throw new Error(`Failed to read tsconfig file ${configPath}: ${formattedDiagnostic}`);
+        }
+
+        if (options.include) {
+            config.config.include = options.include;
+        }
+
+        if (options.exclude) {
+            if (!config.config.exclude) {
+                config.config.exclude = options.exclude;
+            } else {
+                config.config.exclude = (config.config.exclude as string[]).concat(options.exclude);
+            }
         }
 
         const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, searchPath);

@@ -91,6 +91,79 @@ describe("TypeScriptUml", () => {
             expect(executeCut).to.throw(/formatted diagnostic test/);
         });
 
+        it("should keep include of parsed config if not set in options", () => {
+            readConfigFileStub.returns({
+                config: {
+                    include: [
+                        "**/*.ts",
+                    ],
+                },
+                error: undefined,
+            });
+            executeCut();
+            expect(parseJsonConfigFileContentStub).to.have.been.calledWithMatch(sinon.match({
+                include: [
+                    "**/*.ts",
+                ],
+            }));
+        });
+
+        it("should replace include of parsed config if set in options", () => {
+            readConfigFileStub.returns({
+                config: {
+                    include: [
+                        "**/*.ts",
+                    ],
+                },
+                error: undefined,
+            });
+            options.include = [
+                "module/**/*.ts",
+            ];
+            executeCut();
+            expect(parseJsonConfigFileContentStub).to.have.been.calledWithMatch(sinon.match({
+                include: [
+                    "module/**/*.ts",
+                ],
+            }));
+        });
+
+        it("should keep exclude of parsed config if not set in options", () => {
+            readConfigFileStub.returns({
+                config: {
+                    exclude: [
+                        "**/*-spec.ts",
+                    ],
+                },
+                error: undefined,
+            });
+            executeCut();
+            expect(parseJsonConfigFileContentStub).to.have.been.calledWithMatch(sinon.match({
+                exclude: [
+                    "**/*-spec.ts",
+                ],
+            }));
+        });
+
+        it("should add to exclude of parsed config if set in options", () => {
+            readConfigFileStub.returns({
+                config: {
+                    exclude: [
+                        "**/*-spec.ts",
+                    ],
+                },
+                error: undefined,
+            });
+            options.exclude = [
+                "**/*-test.ts",
+            ];
+            executeCut();
+            expect(parseJsonConfigFileContentStub).to.have.been.called;
+            const exclude = parseJsonConfigFileContentStub.getCall(0).args[0].exclude as string[];
+            expect(exclude).to.contain("**/*-spec.ts");
+            expect(exclude).to.contain("**/*-test.ts");
+        });
+
         it("should parse the files from the parsed config", () => {
             const testObject = { testObject: true };
             readConfigFileStub.returns({
