@@ -37,7 +37,7 @@ export interface IClassDiagramOptions {
      * @type {"yuml"}
      * @memberOf IClassDiagramOptions
      */
-    formatter?: "yuml";
+    formatter?: "yuml" | "plantuml";
 
     /**
      * Options for nodes
@@ -175,6 +175,9 @@ export class TypeScriptUml {
         switch (options.formatter) {
             case "yuml":
                 _formatter = new formatter.YumlFormatter();
+                break;
+            case "plantuml":
+                _formatter = new formatter.PlantUMLFormatter();
                 break;
             default:
                 throw new Error(`Unknown formatter ${options.formatter}`);

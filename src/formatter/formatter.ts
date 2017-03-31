@@ -6,11 +6,7 @@ import * as uml from "../uml/index";
  * @export
  * @class AbstractFormatter
  */
-export class AbstractFormatter {
-
-    constructor() {
-        // Constructor
-    }
+export abstract class AbstractFormatter {
 
     /**
      * Generate class diagram for uml code model data
@@ -20,7 +16,5 @@ export class AbstractFormatter {
      *
      * @memberOf Formatter
      */
-    public generateClassDiagram(umlCodeModel: uml.CodeModel): string {
-        return "";
-    }
+    public abstract generateClassDiagram(umlCodeModel: uml.CodeModel): string;
 }
