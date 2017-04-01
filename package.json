@@ -24,7 +24,7 @@
     "test-travis": "ts-node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --compilers ts:ts-node/register -R spec 'src/**/*-spec.ts'"
   },
   "dependencies": {
-    "typescript": "2.0.3",
+    "typescript": "2.2.0",
     "typescript-collections": "^1.2.3",
     "uuid": "^2.0.3"
   },
@@ -42,7 +42,7 @@
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
     "ts-node": "^0.9.3",
-    "tslint": "^4.0.2"
+    "tslint": "^5.0.0"
   },
   "engines": {
     "node": ">=4.0.0"
