@@ -40,13 +40,33 @@ export class Formatter extends AbstractFormatter {
     }
 
     private _formatNode(node: uml.Node): string {
+
         if (node instanceof uml.Class) {
+            let properties = this._formatProperties(node);
+            if (properties !== "") {
+                properties = "|" + properties;
+            }
             switch (node.stereotype) {
                 case uml.Stereotype.Interface:
-                    return `[<<${node.name}>>]`;
+                    return `[<<${node.name}>>${properties}]`;
                 default:
-                    return `[${node.name}]`;
+                    return `[${node.name}${properties}]`;
             }
         }
+    }
+
+    private _formatProperties(node: uml.Class): string {
+        const properties: string[] = [];
+        node.properties.forEach((identifier, type) => {
+            const escapedType = this._replaceSpecialCharacters(type);
+            properties.push(`${identifier}:${escapedType}`);
+        });
+        return properties.join(";");
+    }
+
+    private _replaceSpecialCharacters(value: string): string {
+        return value
+            .replace(/\[/g, "［")
+            .replace(/\]/g, "］");
     }
 }

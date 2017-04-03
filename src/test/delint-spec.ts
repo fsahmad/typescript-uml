@@ -2,8 +2,11 @@ import * as chai from "chai";
 import { readFileSync } from "fs";
 import "mocha";
 import * as ts from "typescript";
+import * as winston from "winston";
+
 import { Delinter } from "../delint";
 import * as uml from "../uml";
+
 const expect = chai.expect;
 
 describe("Delinter", () => {
@@ -13,6 +16,7 @@ describe("Delinter", () => {
     describe("#parse", () => {
         const TEST_FILE_CLASS = "testInput/delint/class.test.ts";
         const TEST_FILE_CLASS_HERITAGE = "testInput/delint/classHeritage.test.ts";
+        const TEST_FILE_CLASS_MEMBER_VARIABLES = "testInput/delint/classMemberVariables.test.ts";
         const TEST_FILE_INTERFACE = "testInput/delint/interface.test.ts";
 
         describe("given class.test.ts", () => {
@@ -128,6 +132,29 @@ describe("Delinter", () => {
             it("should add interface to uml code model", () => {
                 delinter.parse(sourceFile);
                 expect(delinter.umlCodeModel.nodes.containsKey("IBar")).to.be.true;
+            });
+        });
+
+        describe("given classMemberVariables.test.ts", () => {
+            before(() => {
+                sourceFile = ts.createSourceFile(TEST_FILE_CLASS_MEMBER_VARIABLES,
+                    readFileSync(TEST_FILE_CLASS_MEMBER_VARIABLES).toString(),
+                    ts.ScriptTarget.ES5, /*setParentNodes */ true);
+            });
+
+            beforeEach(() => {
+                delinter = new Delinter();
+            });
+
+            it("should add interface to uml code model", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlCodeModel.nodes.containsKey("Foo")).to.be.true;
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.properties.getValue("privatePrimitiveVariable")).to.eq("number");
+                expect(node.properties.getValue("privateClassVariable")).to.eq("Bar");
+                expect(node.properties.getValue("protectedVariable")).to.eq("Baz");
+                expect(node.properties.getValue("publicVariable")).to.eq("string");
             });
         });
 

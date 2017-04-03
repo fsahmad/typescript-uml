@@ -1,6 +1,8 @@
 import { readFileSync } from "fs";
 import * as ts from "typescript";
 import * as uuid from "uuid";
+import * as winston from "winston";
+
 import * as uml from "./uml/index";
 
 export class Delinter {
@@ -34,25 +36,55 @@ export class Delinter {
     }
 
     private _delintNode(node: ts.Node) {
+        winston.log("debug", "delintNode", { "node.kind": node.kind, "ts.SyntaxKind": ts.SyntaxKind[node.kind] });
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
-                this._delintClassDeclaration(node as ts.ClassDeclaration);
+                this._delintClass(node as ts.ClassDeclaration);
                 break;
             case ts.SyntaxKind.InterfaceDeclaration:
-                this._delintInterfaceDeclaration(node as ts.InterfaceDeclaration);
+                this._delintInterface(node as ts.InterfaceDeclaration);
                 break;
             default:
+                ts.forEachChild(node, (n) => { this._delintNode(n); });
                 break;
         }
-        ts.forEachChild(node, (n) => { this._delintNode(n); });
     }
 
-    private _delintClassDeclaration(node: ts.ClassDeclaration) {
+    private _delintClassNode(node: ts.Node, umlClass: uml.Class) {
+        winston.log("debug", "delintClassNode", { "node.kind": node.kind, "ts.SyntaxKind": ts.SyntaxKind[node.kind] });
+        switch (node.kind) {
+            case ts.SyntaxKind.PropertyDeclaration:
+                this._delintClassProperty(node as ts.PropertyDeclaration, umlClass);
+            default:
+                ts.forEachChild(node, (n) => { this._delintClassNode(n, umlClass); });
+                break;
+        }
+    }
+
+    private _delintClass(node: ts.ClassDeclaration) {
         const umlClass = new uml.Class(node.name.getText());
         this._umlCodeModel.nodes.setValue(umlClass.name, umlClass);
 
-        if (node.heritageClauses) {
-            node.heritageClauses.forEach((h) => {
+        this._delintHeritageClauses(node.heritageClauses, umlClass);
+
+        ts.forEachChild(node, (n) => { this._delintClassNode(n, umlClass); });
+    }
+
+    private _delintInterface(node: ts.InterfaceDeclaration) {
+        const umlInterface = new uml.Class(node.name.getText(), uml.Stereotype.Interface);
+        this._umlCodeModel.nodes.setValue(umlInterface.name, umlInterface);
+
+        this._delintHeritageClauses(node.heritageClauses, umlInterface);
+
+        ts.forEachChild(node, (n) => { this._delintClassNode(n, umlInterface); });
+    }
+
+    private _delintHeritageClauses(heritageClauses: ts.HeritageClause[], umlClass: uml.Class) {
+        if (heritageClauses) {
+            heritageClauses.forEach((h) => {
+                winston.log("debug", "delintHeritageClauses",
+                    { "h.token": h.token, "ts.SyntaxKind": ts.SyntaxKind[h.token] });
+
                 switch (h.token) {
                     case ts.SyntaxKind.ImplementsKeyword:
                         h.types.forEach((t) => {
@@ -88,9 +120,10 @@ export class Delinter {
         }
     }
 
-    private _delintInterfaceDeclaration(node: ts.InterfaceDeclaration) {
-        const umlInterface = new uml.Class(node.name.getText(), uml.Stereotype.Interface);
-        this._umlCodeModel.nodes.setValue(umlInterface.name, umlInterface);
-    }
+    private _delintClassProperty(property: ts.PropertyDeclaration, umlClass: uml.Class) {
+        const identifier = property.name.getText();
+        const type = property.type.getText();
 
+        umlClass.properties.setValue(identifier, type);
+    }
 }

@@ -25,19 +25,29 @@ export class Formatter extends AbstractFormatter {
         const content: string[] = [];
         umlCodeModel.nodes.forEach((key, node) => {
             if (node instanceof uml.Class) {
+                const properties = this._formatProperties(node);
+
                 switch (node.stereotype) {
                     case uml.Stereotype.Interface:
-                        content.push(`interface ${node.name}`);
+                        content.push(`interface ${node.name}{\n${properties}\n}\n`);
                         break;
                     case uml.Stereotype.None:
                     default:
-                        content.push(`class ${node.name}`);
+                        content.push(`class ${node.name}{\n${properties}\n}\n`);
                         break;
                 }
             }
         });
 
         return content.join("\n");
+    }
+
+    private _formatProperties(node: uml.Class): string {
+        const properties: string[] = [];
+        node.properties.forEach((identifier, type) => {
+            properties.push(`  ${identifier} : ${type}`);
+        });
+        return properties.join("\n");
     }
 
     private _formatLinks(umlCodeModel: uml.CodeModel): string {

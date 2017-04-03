@@ -46,8 +46,8 @@ describe("PlantUMLFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^@startuml$/m);
-            expect(returnValue).to.match(/^\s*class Foo\s*$/m);
-            expect(returnValue).to.match(/^\s*class Bar\s*$/m);
+            expect(returnValue).to.match(/^\s*class Foo\s*{\s*}\s*$/m);
+            expect(returnValue).to.match(/^\s*class Bar\s*{\s*}\s*$/m);
             expect(returnValue).to.match(/^@enduml$/m);
         });
 
@@ -60,8 +60,8 @@ describe("PlantUMLFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^@startuml$/m);
-            expect(returnValue).to.match(/^\s*interface Foo\s*$/m);
-            expect(returnValue).to.match(/^\s*interface Bar\s*$/m);
+            expect(returnValue).to.match(/^\s*interface Foo\s*{\s*}\s*$/m);
+            expect(returnValue).to.match(/^\s*interface Bar\s*{\s*}\s*$/m);
             expect(returnValue).to.match(/^@enduml$/m);
         });
 
@@ -77,8 +77,8 @@ describe("PlantUMLFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^@startuml$/m);
-            expect(returnValue).to.match(/^\s*class Foo\s*$/m);
-            expect(returnValue).to.match(/^\s*class Bar\s*$/m);
+            expect(returnValue).to.match(/^\s*class Foo\s*{\s*}\s*$/m);
+            expect(returnValue).to.match(/^\s*class Bar\s*{\s*}\s*$/m);
             expect(returnValue).to.match(/^\s*Bar\s*<|--\s*Foo\s*$/m);
             expect(returnValue).to.match(/^@enduml$/m);
         });
@@ -95,9 +95,33 @@ describe("PlantUMLFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^@startuml$/m);
-            expect(returnValue).to.match(/^\s*class Foo\s*$/m);
-            expect(returnValue).to.match(/^\s*interface IBar\s*$/m);
+            expect(returnValue).to.match(/^\s*class Foo\s*{\s*}\s*$/m);
+            expect(returnValue).to.match(/^\s*interface IBar\s*{\s*}\s*$/m);
             expect(returnValue).to.match(/^\s*IBar\s*<|--\s*Foo\s*$/m);
+            expect(returnValue).to.match(/^@enduml$/m);
+        });
+
+        it("should handle uml code model with class properties", () => {
+            const foo = new Uml.Class("Foo");
+            foo.properties.setValue("foo1", "string");
+            foo.properties.setValue("foo2", "number[]");
+
+            const bar = new Uml.Class("Bar");
+            bar.properties.setValue("bar1", "string");
+            bar.properties.setValue("bar2", "number");
+            umlCodeModel.nodes.setValue(foo.name, foo);
+            umlCodeModel.nodes.setValue(bar.name, bar);
+
+            expect(executeCut()).to.not.throw;
+
+            const fooProperties = returnValue.match(/^\s*class Foo\s*{([^}]*)}\s*$/m)[1];
+            const barProperties = returnValue.match(/^\s*class Bar\s*{([^}]*)}\s*$/m)[1];
+
+            expect(returnValue).to.match(/^@startuml$/m);
+            expect(fooProperties).to.match(/^\s*foo1 : string$/m);
+            expect(fooProperties).to.match(/^\s*foo2 : number\[\]$/m);
+            expect(barProperties).to.match(/^\s*bar1 : string$/m);
+            expect(barProperties).to.match(/^\s*bar2 : number$/m);
             expect(returnValue).to.match(/^@enduml$/m);
         });
 
