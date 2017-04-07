@@ -1,21 +1,22 @@
 import * as Collections from "typescript-collections";
 import { Node } from "./node";
 import { Stereotype } from "./stereotype";
+import { VariableProperty } from "./variableProperty";
 
 export class Class extends Node {
 
-    private _properties: Collections.Dictionary<string, string>;
+    private _variables: Collections.Dictionary<string, VariableProperty>;
 
-    public get properties(): Collections.Dictionary<string, string> {
-        return this._properties;
+    public get variables(): Collections.Dictionary<string, VariableProperty> {
+        return this._variables;
     }
 
-    public set properties(value: Collections.Dictionary<string, string>) {
-        this._properties = value;
+    public set variables(value: Collections.Dictionary<string, VariableProperty>) {
+        this._variables = value;
     }
 
     constructor(name: string, stereotype: Stereotype = Stereotype.None) {
         super(name, stereotype);
-        this._properties = new Collections.Dictionary<string, string>();
+        this._variables = new Collections.Dictionary<string, VariableProperty>();
     }
 }

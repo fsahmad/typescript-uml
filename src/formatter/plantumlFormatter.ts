@@ -44,7 +44,7 @@ export class Formatter extends AbstractFormatter {
 
     private _formatProperties(node: uml.Class): string {
         const properties: string[] = [];
-        node.properties.forEach((identifier, type) => {
+        node.variables.forEach((identifier, type) => {
             properties.push(`  ${identifier} : ${type}`);
         });
         return properties.join("\n");

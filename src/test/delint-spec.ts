@@ -1,6 +1,7 @@
 import * as chai from "chai";
 import { readFileSync } from "fs";
 import "mocha";
+import * as sinon from "sinon";
 import * as ts from "typescript";
 import * as winston from "winston";
 
@@ -13,6 +14,26 @@ describe("Delinter", () => {
     let sourceFile: ts.SourceFile;
     let delinter: Delinter;
 
+    function getSourceFile(filename: string) {
+        return ts.createCompilerHost({
+            allowUnreachableCode: true,
+            alwaysStrict: false,
+            module: ts.ModuleKind.CommonJS,
+            moduleResolution: ts.ModuleResolutionKind.NodeJs,
+            noEmitOnError: false,
+            noImplicitAny: false,
+        }, true).getSourceFile(filename,
+            ts.ScriptTarget.ES5,
+            (message) => {
+                // tslint:disable-next-line:no-console
+                console.log(message);
+            });
+    }
+
+    beforeEach(() => {
+        (winston as any).level = "debug";
+    });
+
     describe("#parse", () => {
         const TEST_FILE_CLASS = "testInput/delint/class.test.ts";
         const TEST_FILE_CLASS_HERITAGE = "testInput/delint/classHeritage.test.ts";
@@ -21,8 +42,7 @@ describe("Delinter", () => {
 
         describe("given class.test.ts", () => {
             before(() => {
-                sourceFile = ts.createSourceFile(TEST_FILE_CLASS, readFileSync(TEST_FILE_CLASS).toString(),
-                    ts.ScriptTarget.ES5, /*setParentNodes */ true);
+                sourceFile = getSourceFile(TEST_FILE_CLASS);
             });
 
             beforeEach(() => {
@@ -46,9 +66,7 @@ describe("Delinter", () => {
 
         describe("given classHeritage.test.ts", () => {
             before(() => {
-                sourceFile = ts.createSourceFile(TEST_FILE_CLASS_HERITAGE,
-                    readFileSync(TEST_FILE_CLASS_HERITAGE).toString(),
-                    ts.ScriptTarget.ES5, /*setParentNodes */ true);
+                sourceFile = getSourceFile(TEST_FILE_CLASS_HERITAGE);
             });
 
             beforeEach(() => {
@@ -121,8 +139,7 @@ describe("Delinter", () => {
 
         describe("given interface.test.ts", () => {
             before(() => {
-                sourceFile = ts.createSourceFile(TEST_FILE_INTERFACE, readFileSync(TEST_FILE_INTERFACE).toString(),
-                    ts.ScriptTarget.ES5, /*setParentNodes */ true);
+                sourceFile = getSourceFile(TEST_FILE_INTERFACE);
             });
 
             beforeEach(() => {
@@ -137,24 +154,228 @@ describe("Delinter", () => {
 
         describe("given classMemberVariables.test.ts", () => {
             before(() => {
-                sourceFile = ts.createSourceFile(TEST_FILE_CLASS_MEMBER_VARIABLES,
-                    readFileSync(TEST_FILE_CLASS_MEMBER_VARIABLES).toString(),
-                    ts.ScriptTarget.ES5, /*setParentNodes */ true);
+                sourceFile = getSourceFile(TEST_FILE_CLASS_MEMBER_VARIABLES);
             });
 
             beforeEach(() => {
                 delinter = new Delinter();
             });
 
-            it("should add interface to uml code model", () => {
+            it("should add variables with correct accessibility to code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlCodeModel.nodes.containsKey("Foo")).to.be.true;
 
                 const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
-                expect(node.properties.getValue("privatePrimitiveVariable")).to.eq("number");
-                expect(node.properties.getValue("privateClassVariable")).to.eq("Bar");
-                expect(node.properties.getValue("protectedVariable")).to.eq("Baz");
-                expect(node.properties.getValue("publicVariable")).to.eq("string");
+                expect(node.variables.getValue("_predefinedType"))
+                    .to.have.property("accessibility", uml.Accessibility.Private);
+                expect(node.variables.getValue("protectedVariable"))
+                    .to.have.property("accessibility", uml.Accessibility.Protected);
+                expect(node.variables.getValue("publicVariable"))
+                    .to.have.property("accessibility", uml.Accessibility.Public);
+                expect(node.variables.getValue("implicitPublicVariable"))
+                    .to.have.property("accessibility", uml.Accessibility.Public);
+            });
+
+            it("should add implicit any type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_implicitAny")).to.be.true;
+
+                const variable = node.variables.getValue("_implicitAny");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_implicitAny");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "any");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.ImplicitAny);
+            });
+
+            it("should add predefined type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_predefinedType")).to.be.true;
+
+                const variable = node.variables.getValue("_predefinedType");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_predefinedType");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "number");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.PredefinedType);
+            });
+
+            it("should add type reference type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_typeReference")).to.be.true;
+
+                const variable = node.variables.getValue("_typeReference");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_typeReference");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "Bar");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.TypeReference);
+                expect(variable.type)
+                    .to.have.property("typeArguments")
+                    .with.length(0, "Non-generic type reference shouldn't have type arguments");
+            });
+
+            it("should add generic type reference type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_genericTypeReference")).to.be.true;
+
+                const variable = node.variables.getValue("_genericTypeReference");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_genericTypeReference");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "TBar<string, number>");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.TypeReference);
+                expect(variable.type)
+                    .to.have.property("typeArguments")
+                    .with.length(2, "Generic type reference should have two type arguments");
+                const typeArgs = (variable.type as uml.PrimaryType).typeArguments;
+                expect(typeArgs[0])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "string");
+                expect(typeArgs[1])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "number");
+            });
+
+            it("should add object type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_objectType")).to.be.true;
+
+                const variable = node.variables.getValue("_objectType");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_objectType");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "TypeLiteral");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.ObjectType);
+            });
+
+            it("should add array type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_arrayType")).to.be.true;
+
+                const variable = node.variables.getValue("_arrayType");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_arrayType");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "number[]");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.ArrayType);
+            });
+
+            it("should add tuple type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_tupleType")).to.be.true;
+
+                const variable = node.variables.getValue("_tupleType");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_tupleType");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "[number, string, Bar]");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.TupleType);
+                expect(variable.type)
+                    .to.have.property("typeArguments")
+                    .with.length(3, "Tuple type should have three type arguments");
+                const typeArgs = (variable.type as uml.PrimaryType).typeArguments;
+                expect(typeArgs[0])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "number");
+                expect(typeArgs[1])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "string");
+                expect(typeArgs[2])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "Bar");
+            });
+
+            it("should add type query type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_typeQuery")).to.be.true;
+
+                const variable = node.variables.getValue("_typeQuery");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_typeQuery");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "typeof value");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.TypeQuery);
+            });
+
+            it("should add this type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_thisType")).to.be.true;
+
+                const variable = node.variables.getValue("_thisType");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_thisType");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
+                expect(variable.type).to.have.property("text", "this");
+                expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.ThisType);
+            });
+
+            it("should add union type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_unionType")).to.be.true;
+
+                const variable = node.variables.getValue("_unionType");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_unionType");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.UnionOrIntersectionType);
+                expect(variable.type).to.have.property("text", "string | number | Bar");
+                expect(variable.type).to.have.property("kind", uml.UnionOrIntersectionTypeKind.Union);
+                expect(variable.type)
+                    .to.have.property("types")
+                    .with.length(3, "Union type should have three type arguments");
+                const types = (variable.type as uml.UnionOrIntersectionType).types;
+                expect(types[0])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "string");
+                expect(types[1])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "number");
+                expect(types[2])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "Bar");
+            });
+
+            it("should add intersection type to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("_intersectionType")).to.be.true;
+
+                const variable = node.variables.getValue("_intersectionType");
+                expect(variable).to.be.instanceOf(uml.VariableProperty);
+                expect(variable).to.have.property("name", "_intersectionType");
+                expect(variable).to.have.property("type").which.is.instanceOf(uml.UnionOrIntersectionType);
+                expect(variable.type).to.have.property("text", "Bar & Baz");
+                expect(variable.type).to.have.property("kind", uml.UnionOrIntersectionTypeKind.Intersection);
+                expect(variable.type)
+                    .to.have.property("types")
+                    .with.length(2, "Intersection type should have two type arguments");
+                const types = (variable.type as uml.UnionOrIntersectionType).types;
+                expect(types[0])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "Bar");
+                expect(types[1])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "Baz");
             });
         });
 

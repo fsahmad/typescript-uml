@@ -122,8 +122,97 @@ export class Delinter {
 
     private _delintClassProperty(property: ts.PropertyDeclaration, umlClass: uml.Class) {
         const identifier = property.name.getText();
-        const type = property.type.getText();
 
-        umlClass.properties.setValue(identifier, type);
+        // Default to public accessibility
+        let accessibility = uml.Accessibility.Public;
+
+        if (property.modifiers) {
+            property.modifiers.forEach((m) => {
+                winston.log("debug", "delintClassProperty",
+                    { "m.kind": m.kind, "ts.SyntaxKind": ts.SyntaxKind[m.kind] });
+
+                switch (m.kind) {
+                    case ts.SyntaxKind.PrivateKeyword:
+                        accessibility = uml.Accessibility.Private;
+                        break;
+                    case ts.SyntaxKind.ProtectedKeyword:
+                        accessibility = uml.Accessibility.Protected;
+                        break;
+                    case ts.SyntaxKind.PublicKeyword:
+                        accessibility = uml.Accessibility.Public;
+                        break;
+                }
+            });
+        }
+
+        const type = this._delintType(property.type);
+
+        const variable = new uml.VariableProperty(identifier, accessibility, type);
+
+        umlClass.variables.setValue(identifier, variable);
+    }
+
+    private _delintType(typeNode: ts.TypeNode): uml.PrimaryType | uml.UnionOrIntersectionType {
+        let type: uml.PrimaryType | uml.UnionOrIntersectionType = null;
+        const kind = typeNode ? typeNode.kind : null;
+
+        switch (kind) {
+            case ts.SyntaxKind.AnyKeyword:
+            case ts.SyntaxKind.NumberKeyword:
+            case ts.SyntaxKind.BooleanKeyword:
+            case ts.SyntaxKind.StringKeyword:
+            case ts.SyntaxKind.SymbolKeyword:
+            case ts.SyntaxKind.VoidKeyword:
+                type = new uml.PrimaryType(typeNode.getText(), uml.PrimaryTypeKind.PredefinedType);
+                break;
+            case ts.SyntaxKind.TypeReference:
+                type = new uml.PrimaryType(typeNode.getText(), uml.PrimaryTypeKind.TypeReference);
+                const typeRef = (typeNode as any) as ts.TypeReference;
+                type.typeArguments = this._delintTypeArguments((typeRef.typeArguments as any) as ts.TypeNode[]);
+                break;
+            case ts.SyntaxKind.TypeLiteral:
+                type = new uml.PrimaryType("TypeLiteral", uml.PrimaryTypeKind.ObjectType);
+                break;
+            case ts.SyntaxKind.TupleType:
+                type = new uml.PrimaryType(typeNode.getText(), uml.PrimaryTypeKind.TupleType);
+                const tupleType = typeNode as ts.TupleTypeNode;
+                type.typeArguments = this._delintTypeArguments(tupleType.elementTypes);
+                break;
+            case ts.SyntaxKind.ArrayType:
+                type = new uml.PrimaryType(typeNode.getText(), uml.PrimaryTypeKind.ArrayType);
+                break;
+            case ts.SyntaxKind.TypeQuery:
+                type = new uml.PrimaryType(typeNode.getText(), uml.PrimaryTypeKind.TypeQuery);
+                break;
+            case ts.SyntaxKind.ThisType:
+                type = new uml.PrimaryType(typeNode.getText(), uml.PrimaryTypeKind.ThisType);
+                break;
+            case ts.SyntaxKind.UnionType:
+                type = new uml.UnionOrIntersectionType(typeNode.getText(), uml.UnionOrIntersectionTypeKind.Union);
+                const union = typeNode as ts.UnionOrIntersectionTypeNode;
+                type.types = this._delintTypeArguments(union.types);
+                break;
+            case ts.SyntaxKind.IntersectionType:
+                type = new uml.UnionOrIntersectionType(typeNode.getText(),
+                    uml.UnionOrIntersectionTypeKind.Intersection);
+                const intersection = typeNode as ts.UnionOrIntersectionTypeNode;
+                type.types = this._delintTypeArguments(intersection.types);
+                break;
+            default:
+                type = new uml.PrimaryType("any", uml.PrimaryTypeKind.ImplicitAny);
+                break;
+        }
+
+        return type;
+    }
+
+    private _delintTypeArguments(typeArguments: ts.TypeNode[]): uml.Type[] {
+        let delintedTypes: uml.Type[] = [];
+        if (typeArguments) {
+            delintedTypes = typeArguments.map((value) => {
+                return this._delintType(value);
+            });
+        }
+        return delintedTypes;
     }
 }
