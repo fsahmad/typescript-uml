@@ -101,28 +101,43 @@ describe("PlantUMLFormatter", () => {
             expect(returnValue).to.match(/^@enduml$/m);
         });
 
-        it.skip("should handle uml code model with class variables", () => {
-            // const foo = new Uml.Class("Foo");
-            // foo.variables.setValue("foo1", "string");
-            // foo.variables.setValue("foo2", "number[]");
+        it("should handle uml code model with class variables", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.VariableProperty("foo1",
+                Uml.Accessibility.Public,
+                new Uml.PrimaryType("string", Uml.PrimaryTypeKind.PredefinedType));
+            const foo2 = new Uml.VariableProperty("foo2",
+                Uml.Accessibility.Public,
+                new Uml.PrimaryType("number[]", Uml.PrimaryTypeKind.ArrayType));
 
-            // const bar = new Uml.Class("Bar");
-            // bar.variables.setValue("bar1", "string");
-            // bar.variables.setValue("bar2", "number");
-            // umlCodeModel.nodes.setValue(foo.name, foo);
-            // umlCodeModel.nodes.setValue(bar.name, bar);
+            foo.variables.setValue("foo1", foo1);
+            foo.variables.setValue("foo2", foo2);
 
-            // expect(executeCut()).to.not.throw;
+            const bar = new Uml.Class("Bar");
+            const bar1 = new Uml.VariableProperty("bar1",
+                Uml.Accessibility.Public,
+                new Uml.PrimaryType("string", Uml.PrimaryTypeKind.PredefinedType));
+            const bar2 = new Uml.VariableProperty("bar2",
+                Uml.Accessibility.Public,
+                new Uml.PrimaryType("number", Uml.PrimaryTypeKind.PredefinedType));
 
-            // const foovariables = returnValue.match(/^\s*class Foo\s*{([^}]*)}\s*$/m)[1];
-            // const barvariables = returnValue.match(/^\s*class Bar\s*{([^}]*)}\s*$/m)[1];
+            bar.variables.setValue("bar1", bar1);
+            bar.variables.setValue("bar2", bar2);
 
-            // expect(returnValue).to.match(/^@startuml$/m);
-            // expect(foovariables).to.match(/^\s*foo1 : string$/m);
-            // expect(foovariables).to.match(/^\s*foo2 : number\[\]$/m);
-            // expect(barvariables).to.match(/^\s*bar1 : string$/m);
-            // expect(barvariables).to.match(/^\s*bar2 : number$/m);
-            // expect(returnValue).to.match(/^@enduml$/m);
+            umlCodeModel.nodes.setValue(foo.name, foo);
+            umlCodeModel.nodes.setValue(bar.name, bar);
+
+            expect(executeCut()).to.not.throw;
+
+            const foovariables = returnValue.match(/^\s*class Foo\s*{([^}]*)}\s*$/m)[1];
+            const barvariables = returnValue.match(/^\s*class Bar\s*{([^}]*)}\s*$/m)[1];
+
+            expect(returnValue).to.match(/^@startuml$/m);
+            expect(foovariables).to.match(/^\s*foo1 : string$/m);
+            expect(foovariables).to.match(/^\s*foo2 : number\[\]$/m);
+            expect(barvariables).to.match(/^\s*bar1 : string$/m);
+            expect(barvariables).to.match(/^\s*bar2 : number$/m);
+            expect(returnValue).to.match(/^@enduml$/m);
         });
 
     });
