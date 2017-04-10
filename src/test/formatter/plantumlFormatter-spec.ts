@@ -101,7 +101,7 @@ describe("PlantUMLFormatter", () => {
             expect(returnValue).to.match(/^@enduml$/m);
         });
 
-        it("should handle uml code model with class variables", () => {
+        it("should handle uml code model with public member variables", () => {
             const foo = new Uml.Class("Foo");
             const foo1 = new Uml.VariableProperty("foo1",
                 Uml.Accessibility.Public,
@@ -133,10 +133,48 @@ describe("PlantUMLFormatter", () => {
             const barvariables = returnValue.match(/^\s*class Bar\s*{([^}]*)}\s*$/m)[1];
 
             expect(returnValue).to.match(/^@startuml$/m);
-            expect(foovariables).to.match(/^\s*foo1 : string$/m);
-            expect(foovariables).to.match(/^\s*foo2 : number\[\]$/m);
-            expect(barvariables).to.match(/^\s*bar1 : string$/m);
-            expect(barvariables).to.match(/^\s*bar2 : number$/m);
+            expect(foovariables).to.match(/^\s*\+foo1 : string$/m);
+            expect(foovariables).to.match(/^\s*\+foo2 : number\[\]$/m);
+            expect(barvariables).to.match(/^\s*\+bar1 : string$/m);
+            expect(barvariables).to.match(/^\s*\+bar2 : number$/m);
+            expect(returnValue).to.match(/^@enduml$/m);
+        });
+
+        it("should handle uml code model with protected member variables", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.VariableProperty("foo1",
+                Uml.Accessibility.Protected,
+                new Uml.PrimaryType("string", Uml.PrimaryTypeKind.PredefinedType));
+
+            foo.variables.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.name, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            const foovariables = returnValue.match(/^\s*class Foo\s*{([^}]*)}\s*$/m)[1];
+
+            expect(returnValue).to.match(/^@startuml$/m);
+            expect(foovariables).to.match(/^\s*#foo1 : string$/m);
+            expect(returnValue).to.match(/^@enduml$/m);
+        });
+
+        it("should handle uml code model with private member variables", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.VariableProperty("foo1",
+                Uml.Accessibility.Private,
+                new Uml.PrimaryType("string", Uml.PrimaryTypeKind.PredefinedType));
+
+            foo.variables.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.name, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            const foovariables = returnValue.match(/^\s*class Foo\s*{([^}]*)}\s*$/m)[1];
+
+            expect(returnValue).to.match(/^@startuml$/m);
+            expect(foovariables).to.match(/^\s*\-foo1 : string$/m);
             expect(returnValue).to.match(/^@enduml$/m);
         });
 

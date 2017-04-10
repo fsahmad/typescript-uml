@@ -45,7 +45,20 @@ export class Formatter extends AbstractFormatter {
     private _formatProperties(node: uml.Class): string {
         const properties: string[] = [];
         node.variables.forEach((key, variable) => {
-            properties.push(`  ${variable.name} : ${variable.type.text}`);
+            let accessibility = "";
+            switch (variable.accessibility) {
+                default:
+                case uml.Accessibility.Public:
+                    accessibility = "+";
+                    break;
+                case uml.Accessibility.Protected:
+                    accessibility = "#";
+                    break;
+                case uml.Accessibility.Private:
+                    accessibility = "-";
+                    break;
+            }
+            properties.push(`  ${accessibility}${variable.name} : ${variable.type.text}`);
         });
         return properties.join("\n");
     }
