@@ -1,77 +1,10 @@
 import { existsSync, readFileSync } from "fs";
 import * as ts from "typescript";
+import { IClassDiagramOptions } from "./classDiagramOptions";
 import { Delinter } from "./delint";
 import * as formatter from "./formatter/index";
+import { IParseOptions } from "./parseOptions";
 import * as uml from "./uml/index";
-
-export interface IParseOptions {
-    /**
-     * Include patterns. If defined, overrides the tsconfig's include property.
-     *
-     * @type {string[]}
-     * @memberOf IParseOptions
-     */
-    include?: string[];
-
-    /**
-     * Exclude patterns. If defined, adds to the tsconfig's exclude property.
-     *
-     * @type {string[]}
-     * @memberOf IParseOptions
-     */
-    exclude?: string[];
-
-    /**
-     * Path to typescript config (if not specified, searches for tsconfig.json)
-     *
-     * @type {string}
-     * @memberOf IParseOptions
-     */
-    tsconfig?: string;
-}
-
-export interface IClassDiagramOptions {
-    /**
-     * Formatter to use to generate diagram
-     *
-     * @type {"yuml"}
-     * @memberOf IClassDiagramOptions
-     */
-    formatter?: "yuml" | "plantuml";
-
-    /**
-     * Options for nodes
-     *
-     * @type {{
-     *         include?: string[];
-     *         exclude?: string[];
-     *     }}
-     * @memberOf IClassDiagramOptions
-     */
-    nodes?: {
-        /**
-         * Nodes to exclude.
-         *
-         * If specified, nodes matching the exclude will not be added to the diagram, nor will
-         * nodes linked to them be added (unless linked to a non-excluded node).
-         *
-         * @type {string[]}
-         */
-        exclude?: string[];
-
-        /**
-         * Nodes to include.
-         *
-         * If specified, only the nodes matching the include will be used as starting points
-         * to search for the nodes to add to the diagram.
-         *
-         * @type {string[]}
-         */
-        include?: string[];
-
-        // depth?: number;
-    };
-}
 
 export class TypeScriptUml {
 
