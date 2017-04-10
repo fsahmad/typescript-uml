@@ -31,7 +31,7 @@ describe("Delinter", () => {
     }
 
     beforeEach(() => {
-        (winston as any).level = "debug";
+        // (winston as any).level = "debug";
     });
 
     describe("#parse", () => {
