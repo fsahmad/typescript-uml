@@ -67,7 +67,7 @@ export class Delinter {
 
     private _delintClass(node: ts.ClassDeclaration) {
         const umlClass = new uml.Class(node.name.getText());
-        this._umlCodeModel.nodes.setValue(umlClass.name, umlClass);
+        this._umlCodeModel.nodes.setValue(umlClass.identifier, umlClass);
 
         this._delintHeritageClauses(node.heritageClauses, umlClass);
 
@@ -76,7 +76,7 @@ export class Delinter {
 
     private _delintInterface(node: ts.InterfaceDeclaration) {
         const umlInterface = new uml.Class(node.name.getText(), uml.Stereotype.Interface);
-        this._umlCodeModel.nodes.setValue(umlInterface.name, umlInterface);
+        this._umlCodeModel.nodes.setValue(umlInterface.identifier, umlInterface);
 
         this._delintHeritageClauses(node.heritageClauses, umlInterface);
 
@@ -99,7 +99,7 @@ export class Delinter {
                                 this._umlCodeModel.nodes.setValue(interfaceName, umlInterface);
                             }
 
-                            const generalization = new uml.Generalization(umlClass.name, interfaceName);
+                            const generalization = new uml.Generalization(umlClass.identifier, interfaceName);
                             this._umlCodeModel.generalizations.push(generalization);
                         });
                         break;
@@ -112,7 +112,7 @@ export class Delinter {
                                 this._umlCodeModel.nodes.setValue(parentClassName, umlParentClass);
                             }
 
-                            const generalization = new uml.Generalization(umlClass.name, parentClassName);
+                            const generalization = new uml.Generalization(umlClass.identifier, parentClassName);
                             this._umlCodeModel.generalizations.push(generalization);
                         });
                         break;

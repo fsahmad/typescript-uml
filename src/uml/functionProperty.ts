@@ -26,8 +26,8 @@ export class FunctionProperty extends Property {
         this._returnType = value;
     }
 
-    constructor(name: string, accessibility: Accessibility, stereotype: Stereotype = Stereotype.None) {
-        super(name, accessibility);
+    constructor(identifier: string, accessibility: Accessibility, stereotype: Stereotype = Stereotype.None) {
+        super(identifier, accessibility);
         this._stereotype = stereotype;
         this._parameters = [];
         this._returnType = null;

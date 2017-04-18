@@ -29,14 +29,14 @@ export class VariableProperty extends Property {
 
     /**
      * Creates an instance of VariableProperty.
-     * @param {string} name Variable name
+     * @param {string} identifier Variable identifier
      * @param {Accessibility} accessibility Member accessibility
      * @param {Type} type Type of the variableÎ
      *
      * @memberOf VariableProperty
      */
-    constructor(name: string, accessibility: Accessibility, type: Type) {
-        super(name, accessibility);
+    constructor(identifier: string, accessibility: Accessibility, type: Type) {
+        super(identifier, accessibility);
         this._type = type;
     }
 }

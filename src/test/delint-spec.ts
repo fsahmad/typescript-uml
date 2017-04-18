@@ -184,7 +184,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_implicitAny");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_implicitAny");
+                expect(variable).to.have.property("identifier", "_implicitAny");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "any");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.ImplicitAny);
@@ -198,7 +198,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_predefinedType");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_predefinedType");
+                expect(variable).to.have.property("identifier", "_predefinedType");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "number");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.PredefinedType);
@@ -212,7 +212,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_typeReference");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_typeReference");
+                expect(variable).to.have.property("identifier", "_typeReference");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "Bar");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.TypeReference);
@@ -229,7 +229,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_genericTypeReference");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_genericTypeReference");
+                expect(variable).to.have.property("identifier", "_genericTypeReference");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "TBar<string, number>");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.TypeReference);
@@ -253,7 +253,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_objectType");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_objectType");
+                expect(variable).to.have.property("identifier", "_objectType");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "TypeLiteral");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.ObjectType);
@@ -267,7 +267,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_arrayType");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_arrayType");
+                expect(variable).to.have.property("identifier", "_arrayType");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "number[]");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.ArrayType);
@@ -281,7 +281,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_tupleType");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_tupleType");
+                expect(variable).to.have.property("identifier", "_tupleType");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "[number, string, Bar]");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.TupleType);
@@ -308,7 +308,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_typeQuery");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_typeQuery");
+                expect(variable).to.have.property("identifier", "_typeQuery");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "typeof value");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.TypeQuery);
@@ -322,7 +322,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_thisType");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_thisType");
+                expect(variable).to.have.property("identifier", "_thisType");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.PrimaryType);
                 expect(variable.type).to.have.property("text", "this");
                 expect(variable.type).to.have.property("kind", uml.PrimaryTypeKind.ThisType);
@@ -336,7 +336,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_unionType");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_unionType");
+                expect(variable).to.have.property("identifier", "_unionType");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.UnionOrIntersectionType);
                 expect(variable.type).to.have.property("text", "string | number | Bar");
                 expect(variable.type).to.have.property("kind", uml.UnionOrIntersectionTypeKind.Union);
@@ -363,7 +363,7 @@ describe("Delinter", () => {
 
                 const variable = node.variables.getValue("_intersectionType");
                 expect(variable).to.be.instanceOf(uml.VariableProperty);
-                expect(variable).to.have.property("name", "_intersectionType");
+                expect(variable).to.have.property("identifier", "_intersectionType");
                 expect(variable).to.have.property("type").which.is.instanceOf(uml.UnionOrIntersectionType);
                 expect(variable.type).to.have.property("text", "Bar & Baz");
                 expect(variable.type).to.have.property("kind", uml.UnionOrIntersectionTypeKind.Intersection);

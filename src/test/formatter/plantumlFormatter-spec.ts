@@ -40,8 +40,8 @@ describe("PlantUMLFormatter", () => {
         it("should handle uml code model with unassociated classes", () => {
             const foo = new Uml.Class("Foo");
             const bar = new Uml.Class("Bar");
-            umlCodeModel.nodes.setValue(foo.name, foo);
-            umlCodeModel.nodes.setValue(bar.name, bar);
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
 
             expect(executeCut()).to.not.throw;
 
@@ -54,8 +54,8 @@ describe("PlantUMLFormatter", () => {
         it("should handle uml code model with unassociated interfaces", () => {
             const foo = new Uml.Class("Foo", Uml.Stereotype.Interface);
             const bar = new Uml.Class("Bar", Uml.Stereotype.Interface);
-            umlCodeModel.nodes.setValue(foo.name, foo);
-            umlCodeModel.nodes.setValue(bar.name, bar);
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
 
             expect(executeCut()).to.not.throw;
 
@@ -68,10 +68,10 @@ describe("PlantUMLFormatter", () => {
         it("should handle uml code model with class inheritance", () => {
             const foo = new Uml.Class("Foo");
             const bar = new Uml.Class("Bar");
-            umlCodeModel.nodes.setValue(foo.name, foo);
-            umlCodeModel.nodes.setValue(bar.name, bar);
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
 
-            const generalization = new Uml.Generalization(foo.name, bar.name);
+            const generalization = new Uml.Generalization(foo.identifier, bar.identifier);
             umlCodeModel.generalizations.push(generalization);
 
             expect(executeCut()).to.not.throw;
@@ -86,10 +86,10 @@ describe("PlantUMLFormatter", () => {
         it("should handle uml code model with interface inheritance", () => {
             const foo = new Uml.Class("Foo");
             const bar = new Uml.Class("IBar", Uml.Stereotype.Interface);
-            umlCodeModel.nodes.setValue(foo.name, foo);
-            umlCodeModel.nodes.setValue(bar.name, bar);
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
 
-            const generalization = new Uml.Generalization(foo.name, bar.name);
+            const generalization = new Uml.Generalization(foo.identifier, bar.identifier);
             umlCodeModel.generalizations.push(generalization);
 
             expect(executeCut()).to.not.throw;
@@ -124,8 +124,8 @@ describe("PlantUMLFormatter", () => {
             bar.variables.setValue("bar1", bar1);
             bar.variables.setValue("bar2", bar2);
 
-            umlCodeModel.nodes.setValue(foo.name, foo);
-            umlCodeModel.nodes.setValue(bar.name, bar);
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
 
             expect(executeCut()).to.not.throw;
 
@@ -148,7 +148,7 @@ describe("PlantUMLFormatter", () => {
 
             foo.variables.setValue("foo1", foo1);
 
-            umlCodeModel.nodes.setValue(foo.name, foo);
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
 
             expect(executeCut()).to.not.throw;
 
@@ -167,7 +167,7 @@ describe("PlantUMLFormatter", () => {
 
             foo.variables.setValue("foo1", foo1);
 
-            umlCodeModel.nodes.setValue(foo.name, foo);
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
 
             expect(executeCut()).to.not.throw;
 

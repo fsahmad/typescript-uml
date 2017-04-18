@@ -48,9 +48,9 @@ export class Formatter extends AbstractFormatter {
             }
             switch (node.stereotype) {
                 case uml.Stereotype.Interface:
-                    return `[<<${node.name}>>${properties}]`;
+                    return `[<<${node.identifier}>>${properties}]`;
                 default:
-                    return `[${node.name}${properties}]`;
+                    return `[${node.identifier}${properties}]`;
             }
         }
     }
@@ -72,7 +72,7 @@ export class Formatter extends AbstractFormatter {
                     break;
             }
             const escapedType = this._replaceSpecialCharacters(variable.type.text);
-            properties.push(`${accessibility}${variable.name}:${escapedType}`);
+            properties.push(`${accessibility}${variable.identifier}:${escapedType}`);
         });
         return properties.join(";");
     }

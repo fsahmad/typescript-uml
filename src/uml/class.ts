@@ -25,8 +25,8 @@ export class Class extends Node {
         this._variables = value;
     }
 
-    constructor(name: string, stereotype: Stereotype = Stereotype.None) {
-        super(name, stereotype);
+    constructor(identifier: string, stereotype: Stereotype = Stereotype.None) {
+        super(identifier, stereotype);
         this._methods = new Collections.Dictionary<string, FunctionProperty>();
         this._variables = new Collections.Dictionary<string, VariableProperty>();
     }

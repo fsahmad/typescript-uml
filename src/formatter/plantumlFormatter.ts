@@ -29,11 +29,11 @@ export class Formatter extends AbstractFormatter {
 
                 switch (node.stereotype) {
                     case uml.Stereotype.Interface:
-                        content.push(`interface ${node.name}{\n${properties}\n}\n`);
+                        content.push(`interface ${node.identifier}{\n${properties}\n}\n`);
                         break;
                     case uml.Stereotype.None:
                     default:
-                        content.push(`class ${node.name}{\n${properties}\n}\n`);
+                        content.push(`class ${node.identifier}{\n${properties}\n}\n`);
                         break;
                 }
             }
@@ -58,7 +58,7 @@ export class Formatter extends AbstractFormatter {
                     accessibility = "-";
                     break;
             }
-            properties.push(`  ${accessibility}${variable.name} : ${variable.type.text}`);
+            properties.push(`  ${accessibility}${variable.identifier} : ${variable.type.text}`);
         });
         return properties.join("\n");
     }

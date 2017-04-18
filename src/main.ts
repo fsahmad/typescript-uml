@@ -252,7 +252,7 @@ export class TypeScriptUml {
 
         if (node) {
             return include.find((value) => {
-                return node.name === value;
+                return node.identifier === value;
 
             }) !== undefined;
         } else if (link) {
@@ -267,7 +267,7 @@ export class TypeScriptUml {
 
         return exclude.find((value) => {
             if (node) {
-                return node.name === value;
+                return node.identifier === value;
             } else if (link) {
                 return link.fromName === value || link.toName === value;
             }

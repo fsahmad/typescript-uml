@@ -2,16 +2,16 @@ import { Accessibility } from "./accessibility";
 
 export abstract class Property {
 
-    private _name: string;
+    private _identifier: string;
     private _accessibility: Accessibility;
     private _static: boolean;
 
-    public get name(): string {
-        return this._name;
+    public get identifier(): string {
+        return this._identifier;
     }
 
-    public set name(value: string) {
-        this._name = value;
+    public set identifier(value: string) {
+        this._identifier = value;
     }
 
     public get accessibility(): Accessibility {
@@ -22,8 +22,8 @@ export abstract class Property {
         this._accessibility = value;
     }
 
-    constructor(name: string, accessibility: Accessibility) {
-        this._name = name;
+    constructor(identifier: string, accessibility: Accessibility) {
+        this._identifier = identifier;
         this._accessibility = accessibility;
     }
 }

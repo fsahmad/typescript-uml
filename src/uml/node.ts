@@ -2,15 +2,15 @@ import { Association } from "./association";
 import { Stereotype } from "./stereotype";
 
 export class Node {
-    private _name: string;
+    private _identifier: string;
     private _stereotype: Stereotype;
 
-    public get name(): string {
-        return this._name;
+    public get identifier(): string {
+        return this._identifier;
     }
 
-    public set name(value: string) {
-        this._name = value;
+    public set identifier(value: string) {
+        this._identifier = value;
     }
 
     public get stereotype(): Stereotype {
@@ -21,8 +21,8 @@ export class Node {
         this._stereotype = value;
     }
 
-    constructor(name: string, stereotype: Stereotype = Stereotype.None) {
-        this._name = name;
+    constructor(identifier: string, stereotype: Stereotype = Stereotype.None) {
+        this._identifier = identifier;
         this._stereotype = stereotype;
     }
 }
