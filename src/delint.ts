@@ -55,6 +55,10 @@ export class Delinter {
         switch (node.kind) {
             case ts.SyntaxKind.PropertyDeclaration:
                 this._delintClassProperty(node as ts.PropertyDeclaration, umlClass);
+                break;
+            case ts.SyntaxKind.MethodDeclaration:
+                this._delintClassMethod(node as ts.MethodDeclaration, umlClass);
+                break;
             default:
                 ts.forEachChild(node, (n) => { this._delintClassNode(n, umlClass); });
                 break;
@@ -120,14 +124,53 @@ export class Delinter {
         }
     }
 
+    private _delintClassMethod(methodDeclaration: ts.MethodDeclaration, umlClass: uml.Class) {
+        const identifier = methodDeclaration.name.getText();
+
+        // Default to public accessibility
+        const accessibility = this._delintAccessibilityModifiers(methodDeclaration.modifiers);
+
+        const method = new uml.FunctionProperty(identifier, accessibility);
+
+        if (methodDeclaration.type) {
+            method.returnType = this._delintType(methodDeclaration.type);
+        }
+
+        methodDeclaration.parameters.forEach((p) => {
+            const parameter = new uml.Parameter(p.name.getText());
+            parameter.type = this._delintType(p.type);
+
+            if (p.initializer) {
+                parameter.defaultInitializer = p.initializer.getText();
+                parameter.optional = true;
+            }
+            if (p.questionToken) {
+                parameter.optional = true;
+            }
+
+            method.parameters.push(parameter);
+        });
+
+        umlClass.methods.setValue(identifier, method);
+    }
+
     private _delintClassProperty(property: ts.PropertyDeclaration, umlClass: uml.Class) {
         const identifier = property.name.getText();
 
         // Default to public accessibility
-        let accessibility = uml.Accessibility.Public;
+        const accessibility = this._delintAccessibilityModifiers(property.modifiers);
 
-        if (property.modifiers) {
-            property.modifiers.forEach((m) => {
+        const type = this._delintType(property.type);
+
+        const variable = new uml.VariableProperty(identifier, accessibility, type);
+
+        umlClass.variables.setValue(identifier, variable);
+    }
+
+    private _delintAccessibilityModifiers(modifiers: ts.NodeArray<ts.Modifier>) {
+        let accessibility = uml.Accessibility.Public;
+        if (modifiers) {
+            modifiers.forEach((m) => {
                 winston.log("debug", "delintClassProperty",
                     { "m.kind": m.kind, "ts.SyntaxKind": ts.SyntaxKind[m.kind] });
 
@@ -144,12 +187,7 @@ export class Delinter {
                 }
             });
         }
-
-        const type = this._delintType(property.type);
-
-        const variable = new uml.VariableProperty(identifier, accessibility, type);
-
-        umlClass.variables.setValue(identifier, variable);
+        return accessibility;
     }
 
     private _delintType(typeNode: ts.TypeNode): uml.PrimaryType | uml.UnionOrIntersectionType {

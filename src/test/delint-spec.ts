@@ -38,6 +38,7 @@ describe("Delinter", () => {
         const TEST_FILE_CLASS = "testInput/delint/class.test.ts";
         const TEST_FILE_CLASS_HERITAGE = "testInput/delint/classHeritage.test.ts";
         const TEST_FILE_CLASS_MEMBER_VARIABLES = "testInput/delint/classMemberVariables.test.ts";
+        const TEST_FILE_CLASS_MEMBER_FUNCTIONS = "testInput/delint/classMemberFunctions.test.ts";
         const TEST_FILE_INTERFACE = "testInput/delint/interface.test.ts";
 
         describe("given class.test.ts", () => {
@@ -379,5 +380,156 @@ describe("Delinter", () => {
             });
         });
 
+        describe("given classMemberFunctions.test.ts", () => {
+            before(() => {
+                sourceFile = getSourceFile(TEST_FILE_CLASS_MEMBER_FUNCTIONS);
+            });
+
+            beforeEach(() => {
+                delinter = new Delinter();
+            });
+
+            it("should add functions with correct accessibility to code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.methods.getValue("_privateFunction"))
+                    .to.have.property("accessibility", uml.Accessibility.Private);
+                expect(node.methods.getValue("protectedFunction"))
+                    .to.have.property("accessibility", uml.Accessibility.Protected);
+                expect(node.methods.getValue("publicFunction"))
+                    .to.have.property("accessibility", uml.Accessibility.Public);
+                expect(node.methods.getValue("implicitPublicFunction"))
+                    .to.have.property("accessibility", uml.Accessibility.Public);
+            });
+
+            it("should add functions with null return type if implicit to code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+
+                expect(node.methods.getValue("implicitReturnType"))
+                    .to.have.property("returnType", null);
+            });
+
+            it("should add functions with correct return types to code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+
+                expect(node.methods.getValue("publicFunction"))
+                    .to.have.property("returnType");
+                expect(node.methods.getValue("publicFunction").returnType)
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "void");
+
+                expect(node.methods.getValue("stringReturnType"))
+                    .to.have.property("returnType");
+                expect(node.methods.getValue("stringReturnType").returnType)
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "string");
+
+                expect(node.methods.getValue("unionReturnType"))
+                    .to.have.property("returnType");
+                expect(node.methods.getValue("unionReturnType").returnType)
+                    .to.be.instanceOf(uml.UnionOrIntersectionType)
+                    .to.have.property("types")
+                    .with.length(3, "Union return type should have three type arguments");
+                const types = (node.methods.getValue("unionReturnType").returnType as uml.UnionOrIntersectionType)
+                    .types;
+                expect(types[0])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "Foo");
+                expect(types[1])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "number");
+                expect(types[2])
+                    .to.be.instanceOf(uml.PrimaryType)
+                    .and.to.have.property("text", "string");
+            });
+
+            it("should add function parameters correctly to code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+
+                expect(node.methods.getValue("parameterizedFunction").parameters)
+                    .to.have.lengthOf(3);
+                const parameters = node.methods.getValue("parameterizedFunction").parameters;
+                expect(parameters[0])
+                    .to.be.instanceOf(uml.Parameter)
+                    .and.to.have.property("identifier", "foo");
+                expect(parameters[0])
+                    .to.have.property("type")
+                    .instanceOf(uml.PrimaryType)
+                    .with.property("text", "string");
+
+                expect(parameters[1])
+                    .to.be.instanceOf(uml.Parameter)
+                    .and.to.have.property("identifier", "bar");
+                expect(parameters[1])
+                    .to.have.property("type")
+                    .instanceOf(uml.PrimaryType)
+                    .with.property("text", "number");
+
+                expect(parameters[2])
+                    .to.be.instanceOf(uml.Parameter)
+                    .and.to.have.property("identifier", "baz");
+                expect(parameters[2])
+                    .to.have.property("type")
+                    .instanceOf(uml.PrimaryType)
+                    .with.property("text", "any");
+            });
+
+            it("should add function parameters with initializer correctly to code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+
+                expect(node.methods.getValue("initializerFunction").parameters)
+                    .to.have.lengthOf(2);
+                const parameters = node.methods.getValue("initializerFunction").parameters;
+                expect(parameters[0])
+                    .to.be.instanceOf(uml.Parameter)
+                    .and.to.have.property("identifier", "foo");
+                expect(parameters[0])
+                    .to.have.property("defaultInitializer", null);
+                expect(parameters[0])
+                    .to.have.property("optional", false);
+
+                expect(parameters[1])
+                    .to.be.instanceOf(uml.Parameter)
+                    .and.to.have.property("identifier", "bar");
+                expect(parameters[1])
+                    .to.have.property("defaultInitializer", `"default"`);
+                expect(parameters[1])
+                    .to.have.property("optional", true);
+            });
+
+            it("should add optional function parameters correctly to code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+
+                expect(node.methods.getValue("optionalParameterFunction").parameters)
+                    .to.have.lengthOf(2);
+                const parameters = node.methods.getValue("optionalParameterFunction").parameters;
+                expect(parameters[0])
+                    .to.be.instanceOf(uml.Parameter)
+                    .and.to.have.property("identifier", "foo");
+                expect(parameters[0])
+                    .to.have.property("optional", false);
+                expect(parameters[0])
+                    .to.have.property("defaultInitializer", null);
+
+                expect(parameters[1])
+                    .to.be.instanceOf(uml.Parameter)
+                    .and.to.have.property("identifier", "bar");
+                expect(parameters[1])
+                    .to.have.property("optional", true);
+                expect(parameters[1])
+                    .to.have.property("defaultInitializer", null);
+            });
+        });
     });
 });
