@@ -45,22 +45,40 @@ export class Formatter extends AbstractFormatter {
     private _formatProperties(node: uml.Class): string {
         const properties: string[] = [];
         node.variables.forEach((key, variable) => {
-            let accessibility = "";
-            switch (variable.accessibility) {
-                default:
-                case uml.Accessibility.Public:
-                    accessibility = "+";
-                    break;
-                case uml.Accessibility.Protected:
-                    accessibility = "#";
-                    break;
-                case uml.Accessibility.Private:
-                    accessibility = "-";
-                    break;
-            }
-            properties.push(`  ${accessibility}${variable.identifier} : ${variable.type.text}`);
+            properties.push(this._formatVariable(variable));
+        });
+        node.methods.forEach((key, method) => {
+            properties.push(this._formatMethod(method));
         });
         return properties.join("\n");
+    }
+
+    private _formatVariable(variable: uml.VariableProperty): string {
+        const accessibility = this._formatAccessibility(variable.accessibility);
+        return `  ${accessibility}${variable.identifier} : ${variable.type.text}`;
+    }
+
+    private _formatMethod(method: uml.FunctionProperty): string {
+        const accessibility = this._formatAccessibility(method.accessibility);
+        let returns = "";
+        if (method.returnType) {
+            returns = `: ${method.returnType.text}`;
+        }
+        const parameters = method.parameters.map((p) => {
+            let type = "";
+            let initializer = "";
+            let questionMark = "";
+            if (p.type) {
+                type = `: ${p.type.text}`;
+            }
+            if (p.defaultInitializer) {
+                initializer = ` = ${p.defaultInitializer}`;
+            } else if (p.optional) {
+                questionMark = "?";
+            }
+            return `${p.identifier}${questionMark}${type}${initializer}`;
+        });
+        return `  ${accessibility}${method.identifier}(${parameters.join(", ")})${returns}`;
     }
 
     private _formatLinks(umlCodeModel: uml.CodeModel): string {
@@ -70,5 +88,22 @@ export class Formatter extends AbstractFormatter {
         });
 
         return content.join("\n");
+    }
+
+    private _formatAccessibility(accessibility: uml.Accessibility) {
+        let result = "";
+        switch (accessibility) {
+            default:
+            case uml.Accessibility.Public:
+                result = "+";
+                break;
+            case uml.Accessibility.Protected:
+                result = "#";
+                break;
+            case uml.Accessibility.Private:
+                result = "-";
+                break;
+        }
+        return result;
     }
 }
