@@ -40,41 +40,70 @@ export class Formatter extends AbstractFormatter {
     }
 
     private _formatNode(node: uml.Node): string {
-
         if (node instanceof uml.Class) {
-            let properties = this._formatProperties(node);
-            if (properties !== "") {
-                properties = "|" + properties;
-            }
+            const properties = this._formatProperties(node);
             switch (node.stereotype) {
                 case uml.Stereotype.Interface:
-                    return `[<<${node.identifier}>>${properties}]`;
+                    return `[<<${node.identifier}>>|${properties}]`;
                 default:
-                    return `[${node.identifier}${properties}]`;
+                    return `[${node.identifier}|${properties}]`;
             }
         }
     }
-
     private _formatProperties(node: uml.Class): string {
-        const properties: string[] = [];
-        node.variables.forEach((key, variable) => {
-            let accessibility = "";
-            switch (variable.accessibility) {
-                default:
-                case uml.Accessibility.Public:
-                    accessibility = "+";
-                    break;
-                case uml.Accessibility.Protected:
-                    accessibility = "#";
-                    break;
-                case uml.Accessibility.Private:
-                    accessibility = "-";
-                    break;
+        const variables = node.variables.values().map((variable) => {
+            return this._formatVariable(variable);
+        }).join(";");
+        const methods = node.methods.values().map((method) => {
+            return this._formatMethod(method);
+        }).join(";");
+
+        return this._replaceSpecialCharacters(`${variables}|${methods}`);
+    }
+
+    private _formatVariable(variable: uml.VariableProperty): string {
+        const accessibility = this._formatAccessibility(variable.accessibility);
+        return `${accessibility}${variable.identifier}:${variable.type.text}`;
+    }
+
+    private _formatMethod(method: uml.FunctionProperty): string {
+        const accessibility = this._formatAccessibility(method.accessibility);
+        let returns = "";
+        if (method.returnType) {
+            returns = `:${method.returnType.text}`;
+        }
+        const parameters = method.parameters.map((p) => {
+            let type = "";
+            let initializer = "";
+            let questionMark = "";
+            if (p.type) {
+                type = `:${p.type.text}`;
             }
-            const escapedType = this._replaceSpecialCharacters(variable.type.text);
-            properties.push(`${accessibility}${variable.identifier}:${escapedType}`);
+            if (p.defaultInitializer) {
+                initializer = `=${p.defaultInitializer}`;
+            } else if (p.optional) {
+                questionMark = "?";
+            }
+            return `${p.identifier}${questionMark}${type}${initializer}`;
         });
-        return properties.join(";");
+        return `${accessibility}${method.identifier}(${parameters.join(",")})${returns}`;
+    }
+
+    private _formatAccessibility(accessibility: uml.Accessibility) {
+        let result = "";
+        switch (accessibility) {
+            default:
+            case uml.Accessibility.Public:
+                result = "+";
+                break;
+            case uml.Accessibility.Protected:
+                result = "#";
+                break;
+            case uml.Accessibility.Private:
+                result = "-";
+                break;
+        }
+        return result;
     }
 
     private _replaceSpecialCharacters(value: string): string {

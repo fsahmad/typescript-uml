@@ -45,8 +45,8 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).to.match(/^\[Foo\]\s*$/m);
-            expect(returnValue).to.match(/^\[Bar\]\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|\|\]\s*$/m);
+            expect(returnValue).to.match(/^\[Bar\|\|\]\s*$/m);
         });
 
         it("should handle uml code model with unassociated interfaces", () => {
@@ -58,8 +58,8 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).to.match(/^\[<<Foo>>\]\s*$/m);
-            expect(returnValue).to.match(/^\[<<Bar>>\]\s*$/m);
+            expect(returnValue).to.match(/^\[<<Foo>>\|\|\]\s*$/m);
+            expect(returnValue).to.match(/^\[<<Bar>>\|\|\]\s*$/m);
         });
 
         it("should handle uml code model with class inheritance", () => {
@@ -74,7 +74,7 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).to.match(/^\[Bar\]\^\[Foo\]\s*$/m);
+            expect(returnValue).to.match(/^\[Bar\|\|\]\^\[Foo\|\|\]\s*$/m);
         });
 
         it("should handle uml code model with interface inheritance", () => {
@@ -89,7 +89,7 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).to.match(/^\[<<IBar>>\]\^\[Foo\]\s*$/m);
+            expect(returnValue).to.match(/^\[<<IBar>>\|\|\]\^\[Foo\|\|\]\s*$/m);
         });
 
         it("should not output classes separately when outputted as link", () => {
@@ -104,8 +104,8 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).not.to.match(/^\[Foo\]\s*$/m);
-            expect(returnValue).not.to.match(/^\[<<IBar>>\]\s*$/m);
+            expect(returnValue).not.to.match(/^\[Foo(\|\|)?\]\s*$/m);
+            expect(returnValue).not.to.match(/^\[<<IBar>>(\|\|)?\]\s*$/m);
         });
 
         it("should handle uml code model with public member variables", () => {
@@ -137,8 +137,8 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).to.match(/^\[Foo\|\+foo1:string;\+foo2:number\]\s*$/m);
-            expect(returnValue).to.match(/^\[Bar\|\+bar1:string;\+bar2:number\]\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|\+foo1:string;\+foo2:number\|\]\s*$/m);
+            expect(returnValue).to.match(/^\[Bar\|\+bar1:string;\+bar2:number\|\]\s*$/m);
         });
 
         it("should handle uml code model with protected member variables", () => {
@@ -153,7 +153,7 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).to.match(/^\[Foo\|#foo1:string\]\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|#foo1:string\|\]\s*$/m);
         });
 
         it("should handle uml code model with private member variables", () => {
@@ -168,7 +168,7 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).to.match(/^\[Foo\|-foo1:string\]\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|-foo1:string\|\]\s*$/m);
         });
 
         it("should handle uml code model with special characters", () => {
@@ -182,7 +182,127 @@ describe("YumlFormatter", () => {
             expect(executeCut()).to.not.throw;
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
-            expect(returnValue).to.match(/^\[Foo\|[^\w]*foo1:string［］\]\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|[^\w]*foo1:string［］\|\]\s*$/m);
+        });
+
+        it("should handle uml code model with public member methods", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.FunctionProperty("foo1", Uml.Accessibility.Public);
+
+            foo.methods.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|[^\|]*\|\+foo1\(\)\]\s*$/m);
+        });
+
+        it("should handle uml code model with protected member methods", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.FunctionProperty("foo1", Uml.Accessibility.Protected);
+
+            foo.methods.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|[^\|]*\|#foo1\(\)\]\s*$/m);
+        });
+
+        it("should handle uml code model with private member methods", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.FunctionProperty("foo1", Uml.Accessibility.Private);
+
+            foo.methods.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|[^\|]*\|-foo1\(\)\]\s*$/m);
+        });
+
+        it("should handle uml code model with member method return type", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.FunctionProperty("foo1", Uml.Accessibility.Private);
+            foo1.returnType = new Uml.PrimaryType("boolean", Uml.PrimaryTypeKind.PredefinedType);
+
+            foo.methods.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|[^\|]*\|[^\w]*foo1\(\):boolean\]\s*$/m);
+        });
+
+        it("should handle uml code model with member method parameters", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.FunctionProperty("foo1", Uml.Accessibility.Private);
+            const p1 = new Uml.Parameter("p1");
+            p1.type = new Uml.PrimaryType("number", Uml.PrimaryTypeKind.PredefinedType);
+            const p2 = new Uml.Parameter("p2");
+            p2.type = new Uml.PrimaryType("string", Uml.PrimaryTypeKind.PredefinedType);
+            const p3 = new Uml.Parameter("p3");
+            p3.type = new Uml.PrimaryType("Foo", Uml.PrimaryTypeKind.TypeReference);
+
+            foo1.parameters.push(p1);
+            foo1.parameters.push(p2);
+            foo1.parameters.push(p3);
+
+            foo.methods.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|[^\|]*\|[^\w]*foo1\(p1:number,p2:string,p3:Foo\)\]\s*$/m);
+        });
+
+        it("should handle uml code model with member method parameter initializer", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.FunctionProperty("foo1", Uml.Accessibility.Private);
+            const p1 = new Uml.Parameter("p1");
+            p1.type = new Uml.PrimaryType("number", Uml.PrimaryTypeKind.PredefinedType);
+            p1.defaultInitializer = "99.9";
+            p1.optional = true;
+
+            foo1.parameters.push(p1);
+
+            foo.methods.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|[^\|]*\|[^\w]*foo1\(p1:number=99.9\)\]\s*$/m);
+        });
+
+        it("should handle uml code model with member method optional parameter", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.FunctionProperty("foo1", Uml.Accessibility.Private);
+            const p1 = new Uml.Parameter("p1");
+            p1.type = new Uml.PrimaryType("number", Uml.PrimaryTypeKind.PredefinedType);
+            p1.optional = true;
+
+            foo1.parameters.push(p1);
+
+            foo.methods.setValue("foo1", foo1);
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|[^\|]*\|[^\w]*foo1\(p1\?:number\)\]\s*$/m);
         });
     });
 });
