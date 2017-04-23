@@ -6,6 +6,10 @@ export class Association extends Link {
         super(fromName, toName);
     }
 
+    public reverse(): Association {
+        return new Association(this.toName, this.fromName);
+    }
+
     public toString(): string {
         return `Association(${super.toString()})`;
     }

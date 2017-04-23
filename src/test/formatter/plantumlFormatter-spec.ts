@@ -319,5 +319,37 @@ describe("PlantUMLFormatter", () => {
             expect(returnValue).to.match(/^@enduml$/m);
         });
 
+        it("should handle uml code model with unidirectional association", () => {
+            const foo = new Uml.Class("Foo");
+            const bar = new Uml.Class("Bar");
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
+
+            umlCodeModel.associations.add(new Uml.Association("Foo", "Bar"));
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^@startuml$/m);
+            expect(returnValue).to.match(/^\s*Foo\s*-->\s*Bar\s*$/m);
+            expect(returnValue).to.match(/^@enduml$/m);
+        });
+
+        it("should handle uml code model with bidirectional association", () => {
+            const foo = new Uml.Class("Foo");
+            const bar = new Uml.Class("Bar");
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
+
+            umlCodeModel.associations.add(new Uml.Association("Foo", "Bar"));
+            umlCodeModel.associations.add(new Uml.Association("Bar", "Foo"));
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^@startuml$/m);
+            expect(returnValue).to.match(/^\s*(?:Foo\s*--\s*Bar)|(?:Bar\s*--\s*Foo)\s*$/m);
+            expect(returnValue).to.match(/^@enduml$/m);
+        });
     });
 });

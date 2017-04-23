@@ -83,6 +83,17 @@ export class Formatter extends AbstractFormatter {
 
     private _formatLinks(umlCodeModel: uml.CodeModel): string {
         const content: string[] = [];
+        umlCodeModel.associations.forEach((link) => {
+            const reverse = link.reverse();
+            if (umlCodeModel.associations.contains(reverse)) {
+                if (link.toString().localeCompare(reverse.toString()) < 0) {
+                    content.push(`${link.fromName} -- ${link.toName}`);
+                }
+            } else {
+                content.push(`${link.fromName} --> ${link.toName}`);
+            }
+        });
+
         umlCodeModel.generalizations.forEach((link) => {
             content.push(`${link.toName} <|-- ${link.fromName}`);
         });
