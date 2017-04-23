@@ -260,11 +260,11 @@ describe("TypeScriptUml", () => {
             codeModel.nodes.setValue("Baz", new Uml.Class("Baz", Uml.Stereotype.Interface));
             codeModel.nodes.setValue("Qux", new Uml.Class("Qux"));
 
-            codeModel.associations.push(new Uml.Association("Foo", "Bar"));
-            codeModel.associations.push(new Uml.Association("Bar", "Baz"));
-            codeModel.associations.push(new Uml.Association("Qux", "Baz"));
-            codeModel.generalizations.push(new Uml.Generalization("Foo", "Baz"));
-            codeModel.generalizations.push(new Uml.Generalization("Qux", "Bar"));
+            codeModel.associations.add(new Uml.Association("Foo", "Bar"));
+            codeModel.associations.add(new Uml.Association("Bar", "Baz"));
+            codeModel.associations.add(new Uml.Association("Qux", "Baz"));
+            codeModel.generalizations.add(new Uml.Generalization("Foo", "Baz"));
+            codeModel.generalizations.add(new Uml.Generalization("Qux", "Bar"));
 
             options = {
                 formatter: "yuml",
@@ -305,8 +305,12 @@ describe("TypeScriptUml", () => {
             expect(argCodeModel.nodes.containsKey("Baz")).to.be.true;
             expect(argCodeModel.nodes.containsKey("Qux")).to.be.true;
 
-            expect(argCodeModel.associations).to.eql([codeModel.associations[2]]);
-            expect(argCodeModel.generalizations).to.eql([codeModel.generalizations[0]]);
+            expect(argCodeModel.associations.contains(new Uml.Association("Qux", "Baz")))
+                .to.eql(true, "Missing association Qux -> Baz");
+            expect(argCodeModel.associations.size()).to.equal(1, "Too many associations in code model");
+            expect(argCodeModel.generalizations.contains(new Uml.Generalization("Foo", "Baz")))
+                .to.eql(true, "Missing generalization Foo -> Baz");
+            expect(argCodeModel.generalizations.size()).to.equal(1, "Too many generalizations in code model");
         });
 
         it("should only add include nodes in code model for formatter", () => {
@@ -327,8 +331,8 @@ describe("TypeScriptUml", () => {
             expect(argCodeModel.nodes.containsKey("Baz")).to.be.false;
             expect(argCodeModel.nodes.containsKey("Qux")).to.be.false;
 
-            expect(argCodeModel.associations).to.eql([]);
-            expect(argCodeModel.generalizations).to.eql([]);
+            expect(argCodeModel.associations.isEmpty()).to.be.true;
+            expect(argCodeModel.generalizations.isEmpty()).to.be.true;
         });
 
     });

@@ -23,4 +23,8 @@ export class Link {
         this._fromName = fromName;
         this._toName = toName;
     }
+
+    public toString(): string {
+        return `${this.fromName}->${this.toName}`;
+    }
 }

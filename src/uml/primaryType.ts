@@ -7,14 +7,14 @@ import { Type } from "./type";
  * @enum {number}
  */
 export const enum PrimaryTypeKind {
-    ImplicitAny,
-    PredefinedType,
-    TypeReference,
-    ObjectType,
-    ArrayType,
-    TupleType,
-    TypeQuery,
-    ThisType,
+    ImplicitAny = 0,
+    PredefinedType = 1,
+    TypeReference = 2,
+    ObjectType = 3,
+    ArrayType = 4,
+    TupleType = 5,
+    TypeQuery = 6,
+    ThisType = 7,
 }
 
 /**

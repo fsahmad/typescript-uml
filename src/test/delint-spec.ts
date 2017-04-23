@@ -36,6 +36,7 @@ describe("Delinter", () => {
 
     describe("#parse", () => {
         const TEST_FILE_CLASS = "testInput/delint/class.test.ts";
+        const TEST_FILE_CLASS_ASSOCIATION = "testInput/delint/classAssociation.test.ts";
         const TEST_FILE_CLASS_HERITAGE = "testInput/delint/classHeritage.test.ts";
         const TEST_FILE_CLASS_MEMBER_VARIABLES = "testInput/delint/classMemberVariables.test.ts";
         const TEST_FILE_CLASS_MEMBER_FUNCTIONS = "testInput/delint/classMemberFunctions.test.ts";
@@ -100,12 +101,10 @@ describe("Delinter", () => {
 
             it("should add interface generalizations to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlCodeModel.generalizations.filter((value) => {
-                    return value.fromName === "Foo" && value.toName === "IBar";
-                })).to.have.length(1, "Missing generalization from Foo to IBar");
-                expect(delinter.umlCodeModel.generalizations.filter((value) => {
-                    return value.fromName === "Foo" && value.toName === "IFoo";
-                })).to.have.length(1, "Missing generalization from Foo to IFoo");
+                expect(delinter.umlCodeModel.generalizations.contains(
+                    new uml.Generalization("Foo", "IBar"))).to.be.true;
+                expect(delinter.umlCodeModel.generalizations.contains(
+                    new uml.Generalization("Foo", "IFoo"))).to.be.true;
             });
 
             it("should add parent class to uml code model", () => {
@@ -132,9 +131,8 @@ describe("Delinter", () => {
 
             it("should add extension generalizations to uml code model", () => {
                 delinter.parse(sourceFile);
-                expect(delinter.umlCodeModel.generalizations.filter((value) => {
-                    return value.fromName === "Foo" && value.toName === "Bar";
-                })).to.have.length(1, "Missing generalization from Foo to Bar");
+                expect(delinter.umlCodeModel.generalizations.contains(
+                    new uml.Generalization("Foo", "Bar"))).to.be.true;
             });
         });
 
@@ -529,6 +527,66 @@ describe("Delinter", () => {
                     .to.have.property("optional", true);
                 expect(parameters[1])
                     .to.have.property("defaultInitializer", null);
+            });
+        });
+
+        describe("given classAssociation.test.ts", () => {
+            before(() => {
+                sourceFile = getSourceFile(TEST_FILE_CLASS_ASSOCIATION);
+            });
+
+            beforeEach(() => {
+                delinter = new Delinter();
+            });
+
+            it("should add direct association to uml code model", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "Bar"))).to.be.true;
+            });
+
+            it("should add bidirectional association to uml code model", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "Qux"))).to.be.true;
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Qux", "Foo"))).to.be.true;
+            });
+
+            it("should add associations through union to uml code model", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "Baz"))).to.be.true;
+            });
+
+            it("should add associations through intersection to uml code model", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "IBar"))).to.be.true;
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "IBaz"))).to.be.true;
+            });
+
+            it("should add associations through array type to uml code model", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "IQux"))).to.be.true;
+            });
+
+            it("should add associations through generic type to uml code model", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "Waldo"))).to.be.true;
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "Quuz"))).to.be.true;
+            });
+
+            it("should add associations through tuple type to uml code model", () => {
+                delinter.parse(sourceFile);
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "Corge"))).to.be.true;
+                expect(delinter.umlCodeModel.associations.contains(
+                    new uml.Association("Foo", "Grault"))).to.be.true;
             });
         });
     });

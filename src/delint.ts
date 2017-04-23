@@ -100,7 +100,7 @@ export class Delinter {
                             }
 
                             const generalization = new uml.Generalization(umlClass.identifier, interfaceName);
-                            this._umlCodeModel.generalizations.push(generalization);
+                            this._umlCodeModel.generalizations.add(generalization);
                         });
                         break;
                     case ts.SyntaxKind.ExtendsKeyword:
@@ -113,7 +113,7 @@ export class Delinter {
                             }
 
                             const generalization = new uml.Generalization(umlClass.identifier, parentClassName);
-                            this._umlCodeModel.generalizations.push(generalization);
+                            this._umlCodeModel.generalizations.add(generalization);
                         });
                         break;
                     /* istanbul ignore next: default case never reached */
@@ -165,6 +165,10 @@ export class Delinter {
         const variable = new uml.VariableProperty(identifier, accessibility, type);
 
         umlClass.variables.setValue(identifier, variable);
+
+        this._typeAssociations(umlClass.identifier, type).forEach((a) => {
+            this.umlCodeModel.associations.add(a);
+        });
     }
 
     private _delintAccessibilityModifiers(modifiers: ts.NodeArray<ts.Modifier>) {
@@ -204,7 +208,9 @@ export class Delinter {
                 type = new uml.PrimaryType(typeNode.getText(), uml.PrimaryTypeKind.PredefinedType);
                 break;
             case ts.SyntaxKind.TypeReference:
-                type = new uml.PrimaryType(typeNode.getText(), uml.PrimaryTypeKind.TypeReference);
+                const typeReference = typeNode as ts.TypeReferenceNode;
+                type = new uml.PrimaryType(typeReference.getText(), uml.PrimaryTypeKind.TypeReference);
+                type.name = typeReference.typeName.getText();
                 const typeRef = (typeNode as any) as ts.TypeReference;
                 type.typeArguments = this._delintTypeArguments((typeRef.typeArguments as any) as ts.TypeNode[]);
                 break;
@@ -252,5 +258,35 @@ export class Delinter {
             });
         }
         return delintedTypes;
+    }
+
+    private _typeAssociations(from: string, type: uml.Type): uml.Association[] {
+        // Add association to type
+        let associations: uml.Association[] = [];
+        if (type) {
+            if (type instanceof uml.PrimaryType || type instanceof uml.UnionOrIntersectionType) {
+                switch (type.kind) {
+                    case uml.PrimaryTypeKind.TypeReference:
+                        associations = [new uml.Association(from, type.name)];
+                        // Fall through to process potential (generic) type arguments
+                    case uml.PrimaryTypeKind.ArrayType:
+                    case uml.PrimaryTypeKind.TupleType:
+                        (type as uml.PrimaryType).typeArguments.forEach((t) => {
+                            associations = associations.concat(this._typeAssociations(from, t));
+                        });
+                        break;
+                    case uml.UnionOrIntersectionTypeKind.Union:
+                    case uml.UnionOrIntersectionTypeKind.Intersection:
+                        (type as uml.UnionOrIntersectionType).types.forEach((t) => {
+                            associations = associations.concat(this._typeAssociations(from, t));
+                        });
+                        break;
+                    default:
+                        // Do not produce associations
+                        break;
+                }
+            }
+        }
+        return associations;
     }
 }

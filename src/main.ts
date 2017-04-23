@@ -214,12 +214,16 @@ export class TypeScriptUml {
             }
         });
 
-        newCodeModel.associations = codeModel.associations.filter((association) => {
-            return this._isIncluded(association, include) && !this._isExcluded(association, exclude);
+        codeModel.associations.forEach((association) => {
+            if (this._isIncluded(association, include) && !this._isExcluded(association, exclude)) {
+                newCodeModel.associations.add(association);
+            }
         });
 
-        newCodeModel.generalizations = codeModel.generalizations.filter((generalization) => {
-            return this._isIncluded(generalization, include) && !this._isExcluded(generalization, exclude);
+        codeModel.generalizations.forEach((generalization) => {
+            if (this._isIncluded(generalization, include) && !this._isExcluded(generalization, exclude)) {
+                newCodeModel.generalizations.add(generalization);
+            }
         });
 
         return newCodeModel;
@@ -235,12 +239,16 @@ export class TypeScriptUml {
             }
         });
 
-        newCodeModel.associations = codeModel.associations.filter((association) => {
-            return !this._isExcluded(association, exclude);
+        codeModel.associations.forEach((association) => {
+            if (!this._isExcluded(association, exclude)) {
+                newCodeModel.associations.add(association);
+            }
         });
 
-        newCodeModel.generalizations = codeModel.generalizations.filter((generalization) => {
-            return !this._isExcluded(generalization, exclude);
+        codeModel.generalizations.forEach((generalization) => {
+            if (!this._isExcluded(generalization, exclude)) {
+                newCodeModel.generalizations.add(generalization);
+            }
         });
 
         return newCodeModel;

@@ -69,7 +69,7 @@ describe("YumlFormatter", () => {
             umlCodeModel.nodes.setValue(bar.identifier, bar);
 
             const generalization = new Uml.Generalization(foo.identifier, bar.identifier);
-            umlCodeModel.generalizations.push(generalization);
+            umlCodeModel.generalizations.add(generalization);
 
             expect(executeCut()).to.not.throw;
 
@@ -84,7 +84,7 @@ describe("YumlFormatter", () => {
             umlCodeModel.nodes.setValue(bar.identifier, bar);
 
             const generalization = new Uml.Generalization(foo.identifier, bar.identifier);
-            umlCodeModel.generalizations.push(generalization);
+            umlCodeModel.generalizations.add(generalization);
 
             expect(executeCut()).to.not.throw;
 
@@ -99,7 +99,7 @@ describe("YumlFormatter", () => {
             umlCodeModel.nodes.setValue(bar.identifier, bar);
 
             const generalization = new Uml.Generalization(foo.identifier, bar.identifier);
-            umlCodeModel.generalizations.push(generalization);
+            umlCodeModel.generalizations.add(generalization);
 
             expect(executeCut()).to.not.throw;
 

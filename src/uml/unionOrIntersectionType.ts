@@ -1,8 +1,8 @@
 import { Type } from "./type";
 
 export const enum UnionOrIntersectionTypeKind {
-    Union,
-    Intersection,
+    Union = 100,
+    Intersection = 101,
 }
 
 /**

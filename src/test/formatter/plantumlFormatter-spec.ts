@@ -72,7 +72,7 @@ describe("PlantUMLFormatter", () => {
             umlCodeModel.nodes.setValue(bar.identifier, bar);
 
             const generalization = new Uml.Generalization(foo.identifier, bar.identifier);
-            umlCodeModel.generalizations.push(generalization);
+            umlCodeModel.generalizations.add(generalization);
 
             expect(executeCut()).to.not.throw;
 
@@ -90,7 +90,7 @@ describe("PlantUMLFormatter", () => {
             umlCodeModel.nodes.setValue(bar.identifier, bar);
 
             const generalization = new Uml.Generalization(foo.identifier, bar.identifier);
-            umlCodeModel.generalizations.push(generalization);
+            umlCodeModel.generalizations.add(generalization);
 
             expect(executeCut()).to.not.throw;
 

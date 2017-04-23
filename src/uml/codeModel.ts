@@ -8,8 +8,8 @@ export type NodeDict = Collections.Dictionary<string, Node>;
 export class CodeModel {
 
     private _nodes: NodeDict;
-    private _associations: Association[];
-    private _generalizations: Generalization[];
+    private _associations: Collections.Set<Association>;
+    private _generalizations: Collections.Set<Generalization>;
 
     public get nodes(): NodeDict {
         return this._nodes;
@@ -19,25 +19,25 @@ export class CodeModel {
         this._nodes = value;
     }
 
-    public get associations(): Association[] {
+    public get associations(): Collections.Set<Association> {
         return this._associations;
     }
 
-    public set associations(value: Association[]) {
+    public set associations(value: Collections.Set<Association>) {
         this._associations = value;
     }
 
-    public get generalizations(): Generalization[] {
+    public get generalizations(): Collections.Set<Generalization> {
         return this._generalizations;
     }
 
-    public set generalizations(value: Generalization[]) {
+    public set generalizations(value: Collections.Set<Generalization>) {
         this._generalizations = value;
     }
 
     constructor() {
         this._nodes = new Collections.Dictionary<string, Node>();
-        this._associations = [];
-        this._generalizations = [];
+        this._associations = new Collections.Set<Association>();
+        this._generalizations = new Collections.Set<Generalization>();
     }
 }
