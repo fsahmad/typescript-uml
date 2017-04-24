@@ -31,6 +31,26 @@ export class Formatter extends AbstractFormatter {
             this._outputtedNodes.add(value.toName);
         });
 
+        umlCodeModel.associations.forEach((link) => {
+            const reverse = link.reverse();
+            let formattedAssociation: string = null;
+            if (umlCodeModel.associations.contains(reverse)) {
+                if (link.toString().localeCompare(reverse.toString()) < 0) {
+                    formattedAssociation = this._formatNode(umlCodeModel.nodes.getValue(link.fromName));
+                    formattedAssociation += "-" + this._formatNode(umlCodeModel.nodes.getValue(link.toName)) + "\n";
+                }
+            } else {
+                formattedAssociation = this._formatNode(umlCodeModel.nodes.getValue(link.fromName));
+                formattedAssociation += "->" + this._formatNode(umlCodeModel.nodes.getValue(link.toName)) + "\n";
+            }
+
+            if (formattedAssociation) {
+                yuml += formattedAssociation;
+                this._outputtedNodes.add(link.fromName);
+                this._outputtedNodes.add(link.toName);
+            }
+        });
+
         umlCodeModel.nodes.forEach((key, value) => {
             if (!this._outputtedNodes.contains(key)) {
                 yuml += this._formatNode(value) + "\n";

@@ -304,5 +304,36 @@ describe("YumlFormatter", () => {
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
             expect(returnValue).to.match(/^\[Foo\|[^\|]*\|[^\w]*foo1\(p1\?:number\)\]\s*$/m);
         });
+
+        it("should handle uml code model with unidirectional association", () => {
+            const foo = new Uml.Class("Foo");
+            const bar = new Uml.Class("Bar");
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
+
+            umlCodeModel.associations.add(new Uml.Association("Foo", "Bar"));
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|\|\]\->\[Bar\|\|\]\s*$/m);
+        });
+
+        it("should handle uml code model with bidirectional association", () => {
+            const foo = new Uml.Class("Foo");
+            const bar = new Uml.Class("Bar");
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+            umlCodeModel.nodes.setValue(bar.identifier, bar);
+
+            umlCodeModel.associations.add(new Uml.Association("Foo", "Bar"));
+            umlCodeModel.associations.add(new Uml.Association("Bar", "Foo"));
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^(?:\[Foo\|\|\]\-\[Bar\|\|\])|(?:\[Bar\|\|\]\-\[Foo\|\|\])\s*$/m);
+        });
     });
 });
