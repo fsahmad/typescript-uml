@@ -376,6 +376,40 @@ describe("Delinter", () => {
                     .to.be.instanceOf(uml.PrimaryType)
                     .and.to.have.property("text", "Baz");
             });
+
+            it("should add read only property correctly to the code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("readOnlyProperty")).to.be.true;
+
+                const variable = node.variables.getValue("readOnlyProperty");
+
+                expect(variable)
+                    .to.be.instanceOf(uml.VariableProperty)
+                    .and.to.have.property("stereotype", uml.Stereotype.Get);
+                expect(variable)
+                    .to.have.property("type")
+                    .instanceOf(uml.PrimaryType)
+                    .which.has.property("text", "string");
+            });
+
+            it("should add write only property correctly to the code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("Foo") as uml.Class;
+                expect(node.variables.containsKey("writeOnlyProperty")).to.be.true;
+
+                const variable = node.variables.getValue("writeOnlyProperty");
+
+                expect(variable)
+                    .to.be.instanceOf(uml.VariableProperty)
+                    .and.to.have.property("stereotype", uml.Stereotype.Set);
+                expect(variable)
+                    .to.have.property("type")
+                    .instanceOf(uml.PrimaryType)
+                    .which.has.property("text", "string");
+            });
         });
 
         describe("given classMemberFunctions.test.ts", () => {

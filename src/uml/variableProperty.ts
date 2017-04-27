@@ -1,5 +1,6 @@
 import { Accessibility } from "./accessibility";
 import { Property } from "./property";
+import { Stereotype } from "./Stereotype";
 import { Type } from "./type";
 
 /**
@@ -35,8 +36,13 @@ export class VariableProperty extends Property {
      *
      * @memberOf VariableProperty
      */
-    constructor(identifier: string, accessibility: Accessibility, type: Type) {
-        super(identifier, accessibility);
+    constructor(
+        identifier: string,
+        accessibility: Accessibility,
+        type: Type,
+        stereotype: Stereotype = Stereotype.None,
+    ) {
+        super(identifier, accessibility, stereotype);
         this._type = type;
     }
 }

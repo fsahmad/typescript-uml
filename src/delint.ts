@@ -56,6 +56,10 @@ export class Delinter {
             case ts.SyntaxKind.PropertyDeclaration:
                 this._delintClassProperty(node as ts.PropertyDeclaration, umlClass);
                 break;
+            case ts.SyntaxKind.GetAccessor:
+            case ts.SyntaxKind.SetAccessor:
+                this._delintClassGetterSetter(node as ts.GetAccessorDeclaration | ts.SetAccessorDeclaration, umlClass);
+                break;
             case ts.SyntaxKind.MethodDeclaration:
                 this._delintClassMethod(node as ts.MethodDeclaration, umlClass);
                 break;
@@ -171,6 +175,50 @@ export class Delinter {
         });
     }
 
+    private _delintClassGetterSetter(node: ts.GetAccessorDeclaration | ts.SetAccessorDeclaration, umlClass: uml.Class) {
+        const identifier = node.name.getText();
+
+        // Default to public accessibility
+        const accessibility = this._delintAccessibilityModifiers(node.modifiers);
+
+        let type: uml.Type;
+        if (node.kind === ts.SyntaxKind.GetAccessor) {
+            type = this._delintType(node.type);
+        } else {
+            if (node.parameters.length > 0) {
+                type = this._delintType(node.parameters[0].type);
+            }
+        }
+
+        const variable = new uml.VariableProperty(identifier, accessibility, type);
+
+        // Set stereotype based on kind
+        const existingVariable = umlClass.variables.getValue(identifier);
+        let stereotype: uml.Stereotype;
+        if (node.kind === ts.SyntaxKind.GetAccessor) {
+            // If a setter already exists, use stereotype GetSet
+            if (existingVariable && existingVariable.stereotype === uml.Stereotype.Set) {
+                stereotype = uml.Stereotype.GetSet;
+            } else {
+                stereotype = uml.Stereotype.Get;
+            }
+        } else {
+            // If a setter already exists, use stereotype GetSet
+            if (existingVariable && existingVariable.stereotype === uml.Stereotype.Get) {
+                stereotype = uml.Stereotype.GetSet;
+            } else {
+                stereotype = uml.Stereotype.Set;
+            }
+        }
+        variable.stereotype = stereotype;
+
+        umlClass.variables.setValue(identifier, variable);
+
+        this._typeAssociations(umlClass.identifier, type).forEach((a) => {
+            this.umlCodeModel.associations.add(a);
+        });
+    }
+
     private _delintAccessibilityModifiers(modifiers: ts.NodeArray<ts.Modifier>) {
         let accessibility = uml.Accessibility.Public;
         if (modifiers) {
@@ -268,7 +316,7 @@ export class Delinter {
                 switch (type.kind) {
                     case uml.PrimaryTypeKind.TypeReference:
                         associations = [new uml.Association(from, type.name)];
-                        // Fall through to process potential (generic) type arguments
+                    // Fall through to process potential (generic) type arguments
                     case uml.PrimaryTypeKind.ArrayType:
                     case uml.PrimaryTypeKind.TupleType:
                         (type as uml.PrimaryType).typeArguments.forEach((t) => {

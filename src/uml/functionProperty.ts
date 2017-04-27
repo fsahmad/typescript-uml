@@ -1,12 +1,11 @@
 import { Accessibility } from "./accessibility";
 import { Parameter } from "./parameter";
 import { Property } from "./property";
-import { Stereotype } from "./stereotype";
+import { Stereotype } from "./Stereotype";
 import { Type } from "./type";
 
 export class FunctionProperty extends Property {
 
-    private _stereotype: Stereotype;
     private _parameters: Parameter[];
     private _returnType: Type;
 
@@ -27,8 +26,7 @@ export class FunctionProperty extends Property {
     }
 
     constructor(identifier: string, accessibility: Accessibility, stereotype: Stereotype = Stereotype.None) {
-        super(identifier, accessibility);
-        this._stereotype = stereotype;
+        super(identifier, accessibility, stereotype);
         this._parameters = [];
         this._returnType = null;
     }

@@ -23,4 +23,20 @@ class Foo {
     public publicVariable: string;
 
     implicitPublicVariable: string;
+
+    public get readOnlyProperty(): string {
+        return "";
+    }
+
+    public set writeOnlyProperty(value: string) {
+        
+    }
+
+    public get readWriteProperty(): string {
+        return "";
+    }
+
+    public set readWriteProperty(value: string) {
+        
+    }
 }
