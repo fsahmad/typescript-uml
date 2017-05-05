@@ -210,6 +210,7 @@ describe("TypeScriptUml", () => {
     describe(".parseFile", () => {
         let fileName: string;
         let target: ts.ScriptTarget;
+        let sourceText: string;
         let delinter: Delinter;
         let returnValue: Uml.CodeModel;
         let parseStub: sinon.SinonStub;
@@ -220,11 +221,12 @@ describe("TypeScriptUml", () => {
             createSourceFileSpy = sandbox.spy(ts, "createSourceFile");
             fileName = "";
             target = ts.ScriptTarget.ES5;
+            sourceText = undefined;
             delinter = undefined;
         });
 
         const executeCut = () => {
-            returnValue = tsUml.TypeScriptUml.parseFile(fileName, target, delinter);
+            returnValue = tsUml.TypeScriptUml.parseFile(fileName, target, sourceText, delinter);
         };
 
         it("should parse source file using delinter", () => {

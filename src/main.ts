@@ -27,7 +27,7 @@ export class TypeScriptUml {
         const delinter = new Delinter();
 
         for (const f of tsConfig.fileNames) {
-            this.parseFile(f, tsConfig.options.target, delinter);
+            this.parseFile(f, tsConfig.options.target, undefined, delinter);
         }
 
         return delinter.umlCodeModel;
@@ -44,12 +44,20 @@ export class TypeScriptUml {
      *
      * @memberOf TypeScriptUml
      */
-    public static parseFile(fileName: string, target: ts.ScriptTarget, delinter?: Delinter): uml.CodeModel {
+    public static parseFile(
+        fileName: string,
+        target: ts.ScriptTarget,
+        sourceText?: string,
+        delinter?: Delinter,
+    ): uml.CodeModel {
         if (!delinter) {
             delinter = new Delinter();
         }
 
-        const sourceFile = ts.createSourceFile(fileName, readFileSync(fileName).toString(),
+        if (!sourceText) {
+            sourceText = readFileSync(fileName).toString();
+        }
+        const sourceFile = ts.createSourceFile(fileName, sourceText,
             target, /*setParentNodes */ true);
 
         delinter.parse(sourceFile);
