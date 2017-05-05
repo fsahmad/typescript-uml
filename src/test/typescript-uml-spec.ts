@@ -245,6 +245,19 @@ describe("TypeScriptUml", () => {
             executeCut();
             expect(returnValue).to.be.instanceOf(Uml.CodeModel);
         });
+
+        it("should parse sourceText if defined", () => {
+            fileName = "testInput/delint/class.test.ts";
+            sourceText = "class Bar { }\n";
+            executeCut();
+            expect(parseStub).to.have.been.calledWith(
+                sinon.match({
+                    fileName: "testInput/delint/class.test.ts",
+                    languageVersion: target,
+                    text: sourceText,
+                }));
+        });
+
     });
 
     describe(".generateClassDiagram", () => {
