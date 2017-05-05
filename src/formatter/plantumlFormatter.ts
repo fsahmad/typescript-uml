@@ -18,7 +18,11 @@ export class Formatter extends AbstractFormatter {
         content = this._formatNodes(umlCodeModel);
         content += "\n";
         content += this._formatLinks(umlCodeModel);
-        return `@startuml\n${content}\n@enduml\n`;
+        if (this.options.plantuml.diagramTags) {
+            return `@startuml\n${content}\n@enduml\n`;
+        } else {
+            return content;
+        }
     }
 
     private _formatNodes(umlCodeModel: uml.CodeModel): string {

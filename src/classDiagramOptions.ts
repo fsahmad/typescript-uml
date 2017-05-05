@@ -46,4 +46,19 @@ export interface IClassDiagramOptions {
 
         // depth?: number;
     };
+
+    /**
+     * PlantUML specific options, only used when formatter is set to plantuml
+     *
+     * @memberof IClassDiagramOptions
+     */
+    plantuml?: {
+
+        /**
+         * Output @startuml/@enduml diagram tags?
+         *
+         * @type {boolean}
+         */
+        diagramTags?: boolean;
+    };
 }

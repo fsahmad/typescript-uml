@@ -1,3 +1,4 @@
+import { IClassDiagramOptions } from "../classDiagramOptions";
 import * as uml from "../uml/index";
 
 /**
@@ -7,6 +8,16 @@ import * as uml from "../uml/index";
  * @class AbstractFormatter
  */
 export abstract class AbstractFormatter {
+
+    private _options: IClassDiagramOptions;
+
+    protected get options(): IClassDiagramOptions {
+        return this._options;
+    }
+
+    constructor(options: IClassDiagramOptions) {
+        this._options = options;
+    }
 
     /**
      * Generate class diagram for uml code model data

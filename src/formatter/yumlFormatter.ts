@@ -1,4 +1,5 @@
 import { Set } from "typescript-collections";
+import { IClassDiagramOptions } from "../classDiagramOptions";
 import * as uml from "../uml/index";
 import { AbstractFormatter } from "./formatter";
 
@@ -15,8 +16,8 @@ export class Formatter extends AbstractFormatter {
 
     private _outputtedNodes: Set<string>;
 
-    constructor() {
-        super();
+    constructor(options: IClassDiagramOptions) {
+        super(options);
         this._outputtedNodes = new Set<string>();
     }
 

@@ -83,6 +83,9 @@ export class TypeScriptUml {
                 exclude: null,
                 include: null,
             },
+            plantuml: {
+                diagramTags: true,
+            },
         };
 
         if (!options) {
@@ -104,6 +107,14 @@ export class TypeScriptUml {
             }
         }
 
+        if (!options.hasOwnProperty("plantuml")) {
+            options.plantuml = defaultOptions.plantuml;
+        } else {
+            if (!options.plantuml.hasOwnProperty("diagramTags")) {
+                options.plantuml.diagramTags = defaultOptions.plantuml.diagramTags;
+            }
+        }
+
         let diagramCodeModel = codeModel;
         if (options.nodes.include) {
             // Include nodes
@@ -115,10 +126,10 @@ export class TypeScriptUml {
 
         switch (options.formatter) {
             case "yuml":
-                _formatter = new formatter.YumlFormatter();
+                _formatter = new formatter.YumlFormatter(options);
                 break;
             case "plantuml":
-                _formatter = new formatter.PlantUMLFormatter();
+                _formatter = new formatter.PlantUMLFormatter(options);
                 break;
             default:
                 throw new Error(`Unknown formatter ${options.formatter}`);
