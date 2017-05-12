@@ -13,7 +13,7 @@ addons:
   code_climate:
     repo_token: 47f69d335cd73707e4a5341bc478d7e4116c56924e3586a815c9db596ab90127
 script:
-- npm run lint
+- npm run build
 - npm run test-travis
 after_success:
 - npm install -g codeclimate-test-reporter
