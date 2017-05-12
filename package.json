@@ -1,6 +1,6 @@
 {
   "name": "typescript-uml",
-  "version": "0.3.0-alpha.1",
+  "version": "0.3.0-alpha.2",
   "description": "TypeScript to UML reverse engineering",
   "license": "MIT",
   "repository": {
