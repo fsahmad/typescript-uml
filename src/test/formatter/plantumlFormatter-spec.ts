@@ -72,7 +72,7 @@ describe("PlantUMLFormatter", () => {
             expect(returnValue).to.match(/^@enduml$/m);
         });
 
-        it("should handle uml code model with class stereotype", () => {
+        it.skip("should handle uml code model with class stereotype", () => {
             const foo = new Uml.Class("Foo");
             // foo.stereotype = // To-do
             umlCodeModel.nodes.setValue(foo.identifier, foo);
