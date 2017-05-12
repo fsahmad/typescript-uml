@@ -2,6 +2,7 @@ import * as chai from "chai";
 import * as mocha from "mocha";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
+import { IClassDiagramOptions } from "../../classDiagramOptions";
 import * as Formatter from "../../formatter/index";
 import * as Uml from "../../uml";
 
@@ -11,10 +12,12 @@ chai.use(sinonChai);
 describe("YumlFormatter", () => {
     let sandbox: sinon.SinonSandbox;
     let cut: Formatter.YumlFormatter;
+    let options: IClassDiagramOptions;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
-        cut = new Formatter.YumlFormatter();
+        options = {};
+        cut = new Formatter.YumlFormatter(options);
     });
     afterEach(() => {
         sandbox.restore();
