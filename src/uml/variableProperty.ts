@@ -1,6 +1,6 @@
 import { Accessibility } from "./accessibility";
 import { Property } from "./property";
-import { Stereotype } from "./Stereotype";
+import { Stereotype } from "./stereotype";
 import { Type } from "./type";
 
 /**
