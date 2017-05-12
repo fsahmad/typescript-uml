@@ -72,6 +72,19 @@ describe("PlantUMLFormatter", () => {
             expect(returnValue).to.match(/^@enduml$/m);
         });
 
+        it("should handle uml code model with class stereotype", () => {
+            const foo = new Uml.Class("Foo");
+            // foo.stereotype = // To-do
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^@startuml$/m);
+            expect(returnValue).to.match(/^\s*class Foo\s*{\s*}\s*$/m);
+            expect(returnValue).to.match(/^\s*class Bar\s*{\s*}\s*$/m);
+            expect(returnValue).to.match(/^@enduml$/m);
+        });
+
         it("should handle uml code model with class inheritance", () => {
             const foo = new Uml.Class("Foo");
             const bar = new Uml.Class("Bar");
