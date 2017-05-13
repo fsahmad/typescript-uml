@@ -3,3 +3,5 @@ export * from "./formatter/index";
 export * from "./main";
 export * from "./classDiagramOptions";
 export * from "./parseOptions";
+
+import "./polyfill";

@@ -24,6 +24,7 @@
     "test-travis": "ts-node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --compilers ts:ts-node/register -R spec 'src/**/*-spec.ts'"
   },
   "dependencies": {
+    "array.prototype.find": "^2.0.4",
     "typescript": "^2.2.2",
     "typescript-collections": "^1.2.3",
     "uuid": "^2.0.3",
