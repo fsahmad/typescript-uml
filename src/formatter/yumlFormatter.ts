@@ -1,4 +1,4 @@
-import { Set } from "typescript-collections";
+import * as Collections from "typescript-collections";
 import { IClassDiagramOptions } from "../classDiagramOptions";
 import * as uml from "../uml/index";
 import { AbstractFormatter } from "./formatter";
@@ -14,11 +14,11 @@ import { AbstractFormatter } from "./formatter";
  */
 export class Formatter extends AbstractFormatter {
 
-    private _outputtedNodes: Set<string>;
+    private _outputtedNodes: Collections.Set<string>;
 
     constructor(options: IClassDiagramOptions) {
         super(options);
-        this._outputtedNodes = new Set<string>();
+        this._outputtedNodes = new Collections.Set<string>();
     }
 
     public generateClassDiagram(umlCodeModel: uml.CodeModel): string {

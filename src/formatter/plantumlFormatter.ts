@@ -1,4 +1,3 @@
-import { Set } from "typescript-collections";
 import * as uml from "../uml/index";
 import { AbstractFormatter } from "./formatter";
 
