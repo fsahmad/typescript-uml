@@ -1,7 +1,6 @@
 import { readFileSync } from "fs";
 import * as ts from "typescript";
 import * as uuid from "uuid";
-import * as winston from "winston";
 
 import * as uml from "./uml/index";
 
@@ -36,7 +35,6 @@ export class Delinter {
     }
 
     private _delintNode(node: ts.Node) {
-        winston.log("debug", "delintNode", { "node.kind": node.kind, "ts.SyntaxKind": ts.SyntaxKind[node.kind] });
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
                 this._delintClass(node as ts.ClassDeclaration);
@@ -51,7 +49,6 @@ export class Delinter {
     }
 
     private _delintClassNode(node: ts.Node, umlClass: uml.Class) {
-        winston.log("debug", "delintClassNode", { "node.kind": node.kind, "ts.SyntaxKind": ts.SyntaxKind[node.kind] });
         switch (node.kind) {
             case ts.SyntaxKind.PropertyDeclaration:
                 this._delintClassProperty(node as ts.PropertyDeclaration, umlClass);
@@ -90,9 +87,6 @@ export class Delinter {
     private _delintHeritageClauses(heritageClauses: ts.HeritageClause[], umlClass: uml.Class) {
         if (heritageClauses) {
             heritageClauses.forEach((h) => {
-                winston.log("debug", "delintHeritageClauses",
-                    { "h.token": h.token, "ts.SyntaxKind": ts.SyntaxKind[h.token] });
-
                 switch (h.token) {
                     case ts.SyntaxKind.ImplementsKeyword:
                         h.types.forEach((t) => {
@@ -223,9 +217,6 @@ export class Delinter {
         let accessibility = uml.Accessibility.Public;
         if (modifiers) {
             modifiers.forEach((m) => {
-                winston.log("debug", "delintClassProperty",
-                    { "m.kind": m.kind, "ts.SyntaxKind": ts.SyntaxKind[m.kind] });
-
                 switch (m.kind) {
                     case ts.SyntaxKind.PrivateKeyword:
                         accessibility = uml.Accessibility.Private;

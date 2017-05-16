@@ -3,7 +3,6 @@ import { readFileSync } from "fs";
 import "mocha";
 import * as sinon from "sinon";
 import * as ts from "typescript";
-import * as winston from "winston";
 
 import { Delinter } from "../delint";
 import * as uml from "../uml";
@@ -29,10 +28,6 @@ describe("Delinter", () => {
                 console.log(message);
             });
     }
-
-    beforeEach(() => {
-        // (winston as any).level = "debug";
-    });
 
     describe("#parse", () => {
         const TEST_FILE_CLASS = "testInput/delint/class.test.ts";
