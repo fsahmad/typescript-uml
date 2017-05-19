@@ -144,6 +144,58 @@ describe("Delinter", () => {
                 delinter.parse(sourceFile);
                 expect(delinter.umlCodeModel.nodes.containsKey("IBar")).to.be.true;
             });
+
+            it("should add variable declaration to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("IBar") as uml.Class;
+                expect(node.variables.containsKey("variableDeclaration")).to.be.true;
+                const variable = node.variables.getValue("variableDeclaration");
+
+                expect(variable.accessibility).to.eq(uml.Accessibility.Public);
+                expect(variable.identifier).to.eq("variableDeclaration");
+                expect(variable.type).to.have.property("text", "string");
+                expect(variable.optional).to.be.false;
+            });
+
+            it("should add optional variable declaration to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("IBar") as uml.Class;
+                expect(node.variables.containsKey("optionalDeclaration")).to.be.true;
+                const variable = node.variables.getValue("optionalDeclaration");
+
+                expect(variable.accessibility).to.eq(uml.Accessibility.Public);
+                expect(variable.identifier).to.eq("optionalDeclaration");
+                expect(variable.type).to.have.property("text", "number");
+                expect(variable.optional).to.be.true;
+            });
+
+            it("should add function declaration to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("IBar") as uml.Class;
+                expect(node.methods.containsKey("functionDeclaration")).to.be.true;
+                const method = node.methods.getValue("functionDeclaration");
+
+                expect(method.accessibility).to.eq(uml.Accessibility.Public);
+                expect(method.parameters).to.be.empty;
+                expect(method.returnType.text).to.eq("void");
+                expect(method.optional).to.be.false;
+            });
+
+            it("should add optional function declaration to uml code model", () => {
+                delinter.parse(sourceFile);
+
+                const node = delinter.umlCodeModel.nodes.getValue("IBar") as uml.Class;
+                expect(node.methods.containsKey("optionalFunctionDeclaration")).to.be.true;
+                const method = node.methods.getValue("optionalFunctionDeclaration");
+
+                expect(method.accessibility).to.eq(uml.Accessibility.Public);
+                expect(method.parameters).to.be.empty;
+                expect(method.returnType.text).to.eq("void");
+                expect(method.optional).to.be.true;
+            });
         });
 
         describe("given classMemberVariables.test.ts", () => {

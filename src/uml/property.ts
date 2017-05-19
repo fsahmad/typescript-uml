@@ -6,6 +6,7 @@ export abstract class Property {
     private _identifier: string;
     private _accessibility: Accessibility;
     private _static: boolean;
+    private _optional: boolean;
     private _stereotype: Stereotype;
 
     public get identifier(): string {
@@ -32,6 +33,20 @@ export abstract class Property {
         this._static = value;
     }
 
+    /**
+     * Is variable optional
+     *
+     * @type {boolean}
+     * @memberof VariableProperty
+     */
+    public get optional(): boolean {
+        return this._optional;
+    }
+
+    public set optional(value: boolean) {
+        this._optional = value;
+    }
+
     public get stereotype(): Stereotype {
         return this._stereotype;
     }
@@ -45,5 +60,6 @@ export abstract class Property {
         this._accessibility = accessibility;
         this._stereotype = stereotype;
         this._static = false;
+        this._optional = false;
     }
 }

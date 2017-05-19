@@ -37,10 +37,10 @@ export class Delinter {
     private _delintNode(node: ts.Node) {
         switch (node.kind) {
             case ts.SyntaxKind.ClassDeclaration:
-                this._delintClass(node as ts.ClassDeclaration);
+                this._delintClass(node as ts.ClassDeclaration, this._delintClassNode.bind(this));
                 break;
             case ts.SyntaxKind.InterfaceDeclaration:
-                this._delintInterface(node as ts.InterfaceDeclaration);
+                this._delintClass(node as ts.InterfaceDeclaration, this._delintInterfaceNode.bind(this));
                 break;
             default:
                 ts.forEachChild(node, (n) => { this._delintNode(n); });
@@ -48,17 +48,34 @@ export class Delinter {
         }
     }
 
+    private _delintClass(
+        node: ts.ClassDeclaration | ts.InterfaceDeclaration,
+        delintChild: (child: ts.Node, umlClass: uml.Class) => void,
+    ) {
+        let stereotype = uml.Stereotype.None;
+        if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
+            stereotype = uml.Stereotype.Interface;
+        }
+        const umlClass = new uml.Class(node.name.getText(), stereotype);
+
+        this._umlCodeModel.nodes.setValue(umlClass.identifier, umlClass);
+
+        this._delintHeritageClauses(node.heritageClauses, umlClass);
+
+        ts.forEachChild(node, (n) => { delintChild(n, umlClass); });
+    }
+
     private _delintClassNode(node: ts.Node, umlClass: uml.Class) {
         switch (node.kind) {
             case ts.SyntaxKind.PropertyDeclaration:
-                this._delintClassProperty(node as ts.PropertyDeclaration, umlClass);
+                this._delintProperty(node as ts.PropertyDeclaration, umlClass);
                 break;
             case ts.SyntaxKind.GetAccessor:
             case ts.SyntaxKind.SetAccessor:
                 this._delintClassGetterSetter(node as ts.GetAccessorDeclaration | ts.SetAccessorDeclaration, umlClass);
                 break;
             case ts.SyntaxKind.MethodDeclaration:
-                this._delintClassMethod(node as ts.MethodDeclaration, umlClass);
+                this._delintMethod(node as ts.MethodDeclaration, umlClass);
                 break;
             default:
                 ts.forEachChild(node, (n) => { this._delintClassNode(n, umlClass); });
@@ -66,22 +83,18 @@ export class Delinter {
         }
     }
 
-    private _delintClass(node: ts.ClassDeclaration) {
-        const umlClass = new uml.Class(node.name.getText());
-        this._umlCodeModel.nodes.setValue(umlClass.identifier, umlClass);
-
-        this._delintHeritageClauses(node.heritageClauses, umlClass);
-
-        ts.forEachChild(node, (n) => { this._delintClassNode(n, umlClass); });
-    }
-
-    private _delintInterface(node: ts.InterfaceDeclaration) {
-        const umlInterface = new uml.Class(node.name.getText(), uml.Stereotype.Interface);
-        this._umlCodeModel.nodes.setValue(umlInterface.identifier, umlInterface);
-
-        this._delintHeritageClauses(node.heritageClauses, umlInterface);
-
-        ts.forEachChild(node, (n) => { this._delintClassNode(n, umlInterface); });
+    private _delintInterfaceNode(node: ts.Node, umlClass: uml.Class) {
+        switch (node.kind) {
+            case ts.SyntaxKind.PropertySignature:
+                this._delintProperty(node as ts.PropertySignature, umlClass);
+                break;
+            case ts.SyntaxKind.MethodSignature:
+                this._delintMethod(node as ts.MethodDeclaration, umlClass);
+                break;
+            default:
+                ts.forEachChild(node, (n) => { this._delintClassNode(n, umlClass); });
+                break;
+        }
     }
 
     private _delintHeritageClauses(heritageClauses: ts.HeritageClause[], umlClass: uml.Class) {
@@ -122,7 +135,7 @@ export class Delinter {
         }
     }
 
-    private _delintClassMethod(methodDeclaration: ts.MethodDeclaration, umlClass: uml.Class) {
+    private _delintMethod(methodDeclaration: ts.MethodDeclaration | ts.MethodSignature, umlClass: uml.Class) {
         const identifier = methodDeclaration.name.getText();
 
         // Default to public accessibility
@@ -149,24 +162,9 @@ export class Delinter {
             method.parameters.push(parameter);
         });
 
+        method.optional = methodDeclaration.questionToken !== undefined;
+
         umlClass.methods.setValue(identifier, method);
-    }
-
-    private _delintClassProperty(property: ts.PropertyDeclaration, umlClass: uml.Class) {
-        const identifier = property.name.getText();
-
-        // Default to public accessibility
-        const accessibility = this._delintAccessibilityModifiers(property.modifiers);
-
-        const type = this._delintType(property.type);
-
-        const variable = new uml.VariableProperty(identifier, accessibility, type);
-
-        umlClass.variables.setValue(identifier, variable);
-
-        this._typeAssociations(umlClass.identifier, type).forEach((a) => {
-            this.umlCodeModel.associations.add(a);
-        });
     }
 
     private _delintClassGetterSetter(node: ts.GetAccessorDeclaration | ts.SetAccessorDeclaration, umlClass: uml.Class) {
@@ -209,6 +207,25 @@ export class Delinter {
         umlClass.variables.setValue(identifier, variable);
 
         this._typeAssociations(umlClass.identifier, type).forEach((a) => {
+            this.umlCodeModel.associations.add(a);
+        });
+    }
+
+    private _delintProperty(property: ts.PropertyDeclaration | ts.PropertySignature, umlInterface: uml.Class) {
+        const identifier = property.name.getText();
+
+        // Default to public accessibility
+        const accessibility = this._delintAccessibilityModifiers(property.modifiers);
+
+        const type = this._delintType(property.type);
+
+        const variable = new uml.VariableProperty(identifier, accessibility, type);
+
+        variable.optional = property.questionToken !== undefined;
+
+        umlInterface.variables.setValue(identifier, variable);
+
+        this._typeAssociations(umlInterface.identifier, type).forEach((a) => {
             this.umlCodeModel.associations.add(a);
         });
     }

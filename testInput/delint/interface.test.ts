@@ -1,3 +1,9 @@
 interface IBar {
-    fooBar: string;
+    variableDeclaration: string;
+
+    optionalDeclaration?: number;
+
+    functionDeclaration(): void;
+
+    optionalFunctionDeclaration?(): void;
 }
