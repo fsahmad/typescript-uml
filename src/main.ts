@@ -203,11 +203,8 @@ export class TypeScriptUml {
         }
 
         if (options.exclude) {
-            if (!config.config.exclude) {
-                config.config.exclude = options.exclude;
-            } else {
-                config.config.exclude = (config.config.exclude as string[]).concat(options.exclude);
-            }
+            config.config.exclude = !config.config.exclude ?
+                options.exclude : (config.config.exclude as string[]).concat(options.exclude);
         }
 
         const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, searchPath);

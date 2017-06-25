@@ -189,19 +189,16 @@ export class Delinter {
         let stereotype: uml.Stereotype;
         if (node.kind === ts.SyntaxKind.GetAccessor) {
             // If a setter already exists, use stereotype GetSet
-            if (existingVariable && existingVariable.stereotype === uml.Stereotype.Set) {
-                stereotype = uml.Stereotype.GetSet;
-            } else {
+            stereotype = (existingVariable && existingVariable.stereotype === uml.Stereotype.Set) ?
+                uml.Stereotype.GetSet :
                 stereotype = uml.Stereotype.Get;
-            }
         } else {
             // If a setter already exists, use stereotype GetSet
-            if (existingVariable && existingVariable.stereotype === uml.Stereotype.Get) {
-                stereotype = uml.Stereotype.GetSet;
-            } else {
-                stereotype = uml.Stereotype.Set;
-            }
+            stereotype = (existingVariable && existingVariable.stereotype === uml.Stereotype.Get) ?
+                uml.Stereotype.GetSet :
+                uml.Stereotype.Set;
         }
+
         variable.stereotype = stereotype;
 
         umlClass.variables.setValue(identifier, variable);
