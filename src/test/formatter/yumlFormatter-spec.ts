@@ -52,6 +52,16 @@ describe("YumlFormatter", () => {
             expect(returnValue).to.match(/^\[Bar\|\|\]\s*$/m);
         });
 
+        it("should handle uml code model with abstract class", () => {
+            const foo = new Uml.Class("Foo", Uml.Stereotype.Abstract);
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[<<abstract>>;Foo\|\|\]\s*$/m);
+        });
+
         it("should handle uml code model with unassociated interfaces", () => {
             const foo = new Uml.Class("Foo", Uml.Stereotype.Interface);
             const bar = new Uml.Class("Bar", Uml.Stereotype.Interface);
@@ -172,6 +182,32 @@ describe("YumlFormatter", () => {
 
             expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
             expect(returnValue).to.match(/^\[Foo\|-foo1:string\|\]\s*$/m);
+        });
+
+        it("should handle uml code model with properties", () => {
+            const foo = new Uml.Class("Foo");
+            const foo1 = new Uml.VariableProperty("foo1",
+                Uml.Accessibility.Public,
+                new Uml.PrimaryType("string", Uml.PrimaryTypeKind.PredefinedType),
+                Uml.Stereotype.GetSet);
+            foo.variables.setValue("foo1", foo1);
+            const foo2 = new Uml.VariableProperty("foo2",
+                Uml.Accessibility.Public,
+                new Uml.PrimaryType("string", Uml.PrimaryTypeKind.PredefinedType),
+                Uml.Stereotype.Get);
+            foo.variables.setValue("foo2", foo2);
+            const foo3 = new Uml.VariableProperty("foo3",
+                Uml.Accessibility.Public,
+                new Uml.PrimaryType("string", Uml.PrimaryTypeKind.PredefinedType),
+                Uml.Stereotype.Set);
+            foo.variables.setValue("foo3", foo3);
+
+            umlCodeModel.nodes.setValue(foo.identifier, foo);
+
+            expect(executeCut()).to.not.throw;
+
+            expect(returnValue).to.match(/^\/\/\s*{type:class}\s*$/m);
+            expect(returnValue).to.match(/^\[Foo\|.foo1[^;]*;.<<readonly>>foo2[^;]*;.<<writeonly>>foo3[^;]*\|\]\s*$/m);
         });
 
         it("should handle uml code model with special characters", () => {

@@ -66,6 +66,8 @@ export class Formatter extends AbstractFormatter {
             switch (node.stereotype) {
                 case uml.Stereotype.Interface:
                     return `[<<${node.identifier}>>|${properties}]`;
+                case uml.Stereotype.Abstract:
+                    return `[<<abstract>>;${node.identifier}|${properties}]`;
                 default:
                     return `[${node.identifier}|${properties}]`;
             }
@@ -84,7 +86,18 @@ export class Formatter extends AbstractFormatter {
 
     private _formatVariable(variable: uml.VariableProperty): string {
         const accessibility = this._formatAccessibility(variable.accessibility);
-        return `${accessibility}${variable.identifier}:${variable.type.text}`;
+        let stereotype = "";
+        switch (variable.stereotype) {
+            case uml.Stereotype.Set:
+                stereotype = "<<writeonly>>";
+                break;
+            case uml.Stereotype.Get:
+                stereotype = "<<readonly>>";
+                break;
+            default:
+                break;
+        }
+        return `${accessibility}${stereotype}${variable.identifier}:${variable.type.text}`;
     }
 
     private _formatMethod(method: uml.FunctionProperty): string {
